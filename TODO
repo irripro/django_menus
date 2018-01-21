@@ -1,0 +1,29 @@
+
+Features I would like
+--------
+like
+-------------
+To build menu items from a variety of sources (other menus, external links, models (ansolute URLS, reverse URLS)).
+To hard-code the menu itself (no looping in templates)
+Rendering as tabs or lists?
+path delivery
+permission handling
+auto generation
+
+don't care
+----------
+Code or model
+GUI
+parent/sibling
+trees in general
+
+
+==
+Also, there is a computational question about implementation. According to the discussion about relative databases, a 'category' is not part of a Model (it is 'the truth', it is 'the whole truth', but it is not 'and nothing but the truth'). So a Model category should be kept in a seperate table. But there is a case to keep categories as part of a Model. In practice, a category will be closely bound, may well be specific, to one model only. Keeping category data on the model itself keeps table data compacted and relevant (one downside would be if query joins became complex, which is one of the prime reasons for normalising. Another would be clarity for database maintenence. But if binding to one type of object is assured, both these use cases become less of a hinderance).
+
+----
+Problems menu systems may have... Let's say a menu is rendered in a template. That could be done with a category. Ok, what if it has a submenu? Our template becomes something like,
+
+{{ menu1 + menu2[as exta item] }}
+
+Ok, that would be done in a context. But it's a mess, right? We're assembling menus as items into new menus.

@@ -1,0 +1,3 @@
+Note on the license
+-------------------
+This software originated in the code 'menu-generator'. This code was itself based in 'django-menuware'. I have changed the enclosed Licence to stock Django. 'menu-generator' and 'django-menuware' distributed under a (very free) MIT Licence. To my current understanding, the license modification is possible. I am not currently aware of the precise requirements. However, I wish to acknowledge the original authors.
