@@ -14,6 +14,9 @@ from django.core.exceptions import ImproperlyConfigured
 
 MENU_DICT = ".menus.MENUS"
 
+
+
+
 #! need an all(), cached
 #? lazy data gathering, to cache
 #! recursion here
@@ -21,9 +24,12 @@ MENU_DICT = ".menus.MENUS"
 #? but if recursion ok, stock map...
 #? use attributes, not string keys
 class MenuManager():
-  
+    #{app -> [menu_name -> data]}
+    all_app_menus = {}
+    
     def __init__(self):
-        super().__init__()
+        self.load_app_menus()
+        #super().__init__()
         
     def get_callable(self, func_or_path):
         """
@@ -37,57 +43,55 @@ class MenuManager():
         _module = import_module(module_name)
         func = getattr(_module, function_name)
         return func
-    
-    def get_menu_from_apps(self, menu_name):
-        """
-        Returns a consumable menulist for a given menu_name found in each menus.py file (if exists) on each app on
-        INSTALLED_APPS
-        :param menu_name: String, name of the menu to be found
-        :return: Consumable menu list
-        """
+
+    def load_app_menus(self):
         installed_apps = getattr(settings, "INSTALLED_APPS", [])
-        menu_list = []
         for app in installed_apps:
             try:
-                #print(str(app + MENU_DICT))
-                all_menus_dict = self.get_callable(app + MENU_DICT)
+                app_menus = self.get_callable(app + MENU_DICT)
             except ImportError:
-                all_menus_dict = None
+                app_menus = None
             except AttributeError:
-                all_menus_dict = None
-            if all_menus_dict:
-                menu_list += all_menus_dict.get(menu_name, [])
-        return menu_list
+                app_menus = None
+            if app_menus:
+                 self.all_app_menus[app] = app_menus       
     
-    def get_menu(self, menu_name):
+    def get(self, app, menu_name):
         """
-        Returns a consumable menu list for a given menu_name found in settings.py.
-        Else it returns an empty list.
-    
-        Update, March 18 2017: Now the function get the menu list from settings and append more items if found on the
-        menus.py's 'MENUS' dict.
-        :param context: Template context
-        :param menu_name: String, name of the menu to be found
-        :return: Generated menu
+        Get menu data.
+        
+        @return if fails, return None
         """
-        print('......get_menu')
-        menu_list = getattr(settings, menu_name, defaults.MENU_NOT_FOUND)
-        menu_from_apps = self.get_menu_from_apps(menu_name)
-        # If there isn't a menu on settings but there is menu from apps we built menu from apps
-        if menu_list == defaults.MENU_NOT_FOUND and menu_from_apps:
-            menu_list = menu_from_apps
-        # It there is a menu on settings and also on apps we merge both menus
-        elif menu_list != defaults.MENU_NOT_FOUND and menu_from_apps:
-            #! this error could be static checked
-            menu_list += menu_from_apps
-            raise ImproperlyConfigured('A menu name in Settings is the same as a menu name in an application: menu name:{}: application{}'.format(
-            menu_name,
-            'TODO: this app name'
-            ))
-        #print(str(menu_list))
-        #return generate_menu(context['request'], menu_list)
-        #visible_menu = generate_menu(context['request'], menu_list)
-        return menu_list
+        if (app in self.all_app_menus):
+            return self.all_app_menus[app].get(menu_name)        
+
+    def get_menus(self, app, menu_names):
+        """
+        Get data from several menus.
+        
+        @return if fails, return empty list
+        """
+        if (not app in self.all_app_menus):
+            return []
+        return {mn:self.all_app_menus[app][mn] for mn in self.all_app_menus[app].keys() if (mn in menu_names)}
+            
+    def __str__(self):
+        return '<{}>'.format(
+            self.__class__.__name__
+            )
+
+    def __repr__(self):
+        b = []
+        for app_name, v in self.all_app_menus.items():
+            for menu_name in v.keys():
+                b.append('{}->{}'.format(app_name, menu_name))
+        menus = ';'.join(b)
+        
+        return '<{} menus:{}>'.format(
+            self.__class__.__name__,
+            menus,
+        )
+
 
 
 #MenuSet    

@@ -2,7 +2,7 @@ Django Menus
 ============
 A menu generator for Django applications.
 
-Uses a hard coded base. As the author of another Django app wrote, "Who wants to use Admin to maintain menus?" (several few applications use this approach).
+Uses a hard coded base. As the author of another Django app wrote, "Who wants to use Admin to maintain menus?" (several applications use this approach).
 
 
 
