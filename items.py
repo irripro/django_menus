@@ -1,9 +1,19 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.widgets import Media
 
+#! must do all the URL/attr gear of URL
 class SubMenu():
-    def __init__(self, name):
+    submenu = None
+    
+    def __init__(self, name, url, menu_ref,
+            icon_ref=None, 
+            icon_submenu_ref=None,
+        ):
+        self.menu_ref = menu_ref
         self.name = name
+        self.url = url
+        self.icon_ref = icon_ref
+        self.icon_submenu_ref = icon_submenu_ref
 
 class Separator:
     pass
@@ -20,7 +30,7 @@ class URL():
     clean_url = None
     
     def __init__(self, name, url,
-        icon_class=None, 
+        icon_ref=None, 
         localize=False, 
         disabled=False,
         validators=[],
@@ -28,7 +38,7 @@ class URL():
         ):
         self.name = name
         self.url = url
-        self.icon_class = icon_class
+        self.icon_ref = icon_ref
         self.localize = localize
         self.disabled = disabled
         if (validators):
@@ -61,14 +71,14 @@ class QuerySet():
     title_field = None
     url_template = None
     use_absolute_url = False
-    icon_class=None, 
+    icon_ref=None, 
     localize=False, 
     disabled=False,
     validators=None,
     attrs={}
         
     def __init__(self, queryset, title_field=None, url_field=None, use_absolute_url=False,
-        icon_class=None, 
+        icon_ref=None, 
         localize=False, 
         disabled=False,
         validators=None,
@@ -84,8 +94,8 @@ class QuerySet():
             self.use_absolute_url = use_absolute_url
         if (not(self.url_field or self.use_absolute_url)):
             raise ImproperlyConfigured("'url_field' or 'use_absolute_url' attribute required")
-        if (icon_class):
-            self.icon_class=icon_class 
+        if (icon_ref):
+            self.icon_ref=icon_ref 
         if (localize):
             self.localize=localize 
         if (disabled):
@@ -100,7 +110,7 @@ class QuerySet():
             name = o.title_field
             url = o.get_absolute_url() if (self.use_absolute_url) else o.title_field
             item = URL(name, url,
-                icon_class=self.icon_class, 
+                icon_ref=self.icon_ref, 
                 localize=self.localize, 
                 disabled=self.disabled,
                 validators=self.validators,

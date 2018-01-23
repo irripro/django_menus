@@ -12,17 +12,18 @@ from django.utils.safestring import mark_safe
 
 from django.utils.html import conditional_escape, html_safe, format_html
 
-from .items import URL, Separator
+from .items import URL, SubMenu, Separator
 
 #! rethink HTML
 #! build basic CSS
+#! media
 #! 'active' not enabled
-#! icon_class
+#! icon_ref
 #! disabled
 #! Separator
 #! item attrs
 #! attrs shoud be default, if not item overriden?
-#! since template filters only take one paramete, namespacing, or auto-app detection?
+#! since template filters only take one parameter, namespacing, or auto-app detection?
 class Menu():
     """
     Base class that generates menu list.
@@ -31,7 +32,9 @@ class Menu():
     @param data [{menu item}, ...]
     """
     #? maybe for submenus also
-    media = Media()
+    media = Media(
+        css = {'all':'/django_menus/dropdown.css'}
+    )
     attrs = {}
     _built_attrs = ''
     _css_classes = ''
@@ -64,47 +67,77 @@ class Menu():
             b.append('{0}="{1}"'.format(k, v))
         return ' '.join(b)
         
+    def _rend_css_classes(self, extra_class_names=''):
+        if (self._css_classes and extra_class_names):
+            extra_class_names = ' ' + extra_class_names
+        return 'class="{}{}"'.format(self._css_classes, extra_class_names)
+                
     #! test 'active'
     def _html_output_recursive(self, b, menu, row_tmpl, menu_start, menu_end):
         "Output HTML. Used by as_table(), as_ul(), as_p()."
         for e in menu:
             print('rend:')
             print(str(e))
-            if (isinstance(e, list)):
-                b.append(menu_start)
-                self._html_output_recursive(b, e, row_tmpl, menu_start, menu_end)
-                b.append(menu_end)
-            else:
-                if (isinstance(e, Separator)):
-                    b.append('<hr/>')
-                elif (isinstance(e, URL)):
-                    e.clean()
-                    if (not e.valid):
-                        css_classes = 'class="{}{}"'.format(
-                           self._css_classes,
-                           ' disabled'
-                        )
-                        entry_str = '<li {attrs}>{icon}{name}</li>'.format(
-                           attrs = self._built_attrs + css_classes,
-                           icon = e.icon_class if (e.icon_class) else '',
-                           name = conditional_escape(e.name)
-                        ) 
 
-                        b.append(entry_str)                        
-                    else:
-                        css_classes = 'class="{}{}"'.format(
-                           self._css_classes,
-                           ' active' # if (e['selected']) else ''
-                        )
-                        entry_str = row_tmpl.format(
-                           attrs = self._built_attrs + css_classes,
-                           icon = e.icon_class if (e.icon_class) else '',
-                           url = e.clean_url,
-                           name = conditional_escape(e.name)
-                        )             
-                        print('entry_str:')
-                        print(str(entry_str))
-                        b.append(entry_str)
+            if (isinstance(e, Separator)):
+                b.append('<hr/>')
+            elif (isinstance(e, SubMenu)):
+                icon = '' 
+                if (e.icon_ref is not None):
+                    icon = '<img class="menu-item-icon" src="{}" />'.format(
+                    e.icon_ref
+                    )
+                submenu_icon = '' 
+                if (e.icon_submenu_ref is not None):
+                    submenu_icon = '<img class="menu-submenu-icon" src="{}" />'.format(
+                    e.icon_submenu_ref
+                    )
+                open_row_tmpl='<li {attrs}>{icon}<a href="{url}">{name}{submenu_icon}</a>'
+                entry_str = open_row_tmpl.format(
+                   attrs = self._built_attrs + self._rend_css_classes(),
+                   icon = icon,
+                   url = e.url,
+                   submenu_icon = submenu_icon,
+                   name = conditional_escape(e.name),
+                )                  
+                b.append(entry_str)                        
+                b.append(menu_start)
+                self._html_output_recursive(b, e.submenu, row_tmpl, menu_start, menu_end)
+                b.append(menu_end)
+                b.append('</li>')
+            elif (isinstance(e, URL)):
+                icon = '' 
+                if (e.icon_ref is not None):
+                    icon = '<img class="menu-item-icon" src="{}" />'.format(
+                    e.icon_ref
+                    )
+                e.clean()
+                if (not e.valid):
+                    css_classes = 'class="{}{}"'.format(
+                       self._css_classes,
+                       ' disabled'
+                    )
+                    entry_str = '<li {attrs}>{icon}{name}</li>'.format(
+                       attrs = self._built_attrs + css_classes,
+                       icon = icon,
+                       name = conditional_escape(e.name),
+                    ) 
+
+                    b.append(entry_str)                        
+                else:
+                    css_classes = 'class="{}{}"'.format(
+                       self._css_classes,
+                       ' active' # if (e['selected']) else ''
+                    )
+                    entry_str = row_tmpl.format(
+                       attrs = self._built_attrs + css_classes,
+                       icon = icon,
+                       url = e.clean_url,
+                       name = conditional_escape(e.name)
+                    )             
+                    print('entry_str:')
+                    print(str(entry_str))
+                    b.append(entry_str)
 
     def _html_output(self, row_tmpl, menu_start, menu_end):
         b = []

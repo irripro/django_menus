@@ -52,9 +52,9 @@ class MenuManager():
         if (menu):
             for idx, e in enumerate(menu):
                  if (isinstance(e, SubMenu)):
-                     submenu = self.get_recursive(app, e.name)
+                     submenu = self.get_recursive(app, e.menu_ref)
                      #! delete if fails?
-                     menu[idx] = submenu
+                     menu[idx].submenu = submenu
         return menu
         
         
