@@ -14,13 +14,20 @@ from django.utils.html import conditional_escape, html_safe, format_html
 
 from .items import URL, Separator
 
-
-# could use own attrs
-# and overall presets, disabled etc.
+#! rethink HTML
+#! build basic CSS
+#! 'active' not enabled
+#! icon_class
+#! disabled
+#! Separator
+#! item attrs
+#! attrs shoud be default, if not item overriden?
+#! since template filters only take one paramete, namespacing, or auto-app detection?
 class Menu():
     """
     Base class that generates menu list.
     
+    @param attrs to add to menu items
     @param data [{menu item}, ...]
     """
     #? maybe for submenus also
@@ -36,8 +43,13 @@ class Menu():
         self.empty_permitted = empty_permitted
         css_classes = attrs.pop('class', None)
         if (css_classes):
-          self._css_classes = ' '.join(css_classes)
+            if (self._css_classes):
+                self._css_classes = self._css_classes + ' ' + css_classes
+            else:
+                self._css_classes = css_classes
+              
         if (not attrs):
+            #! chain
             attrs = self.attrs
         self._built_attrs =  self._build_attrs(attrs)
 
@@ -67,18 +79,32 @@ class Menu():
                     b.append('<hr/>')
                 elif (isinstance(e, URL)):
                     e.clean()
-                    attrs = self._built_attrs
-                    css_classes = 'class="{}{}"'.format(
-                       self._css_classes,
-                       ' active' # if (e['selected']) else ''
-                    )
-                    entry_str = format_html(row_tmpl,
-                       attrs = attrs + css_classes,
-                       icon = e.icon_class if (e.icon_class) else '',
-                       url = e.clean_url,
-                       name = conditional_escape(e.name)
-                    )             
-                    b.append(entry_str)
+                    if (not e.valid):
+                        css_classes = 'class="{}{}"'.format(
+                           self._css_classes,
+                           ' disabled'
+                        )
+                        entry_str = '<li {attrs}>{icon}{name}</li>'.format(
+                           attrs = self._built_attrs + css_classes,
+                           icon = e.icon_class if (e.icon_class) else '',
+                           name = conditional_escape(e.name)
+                        ) 
+
+                        b.append(entry_str)                        
+                    else:
+                        css_classes = 'class="{}{}"'.format(
+                           self._css_classes,
+                           ' active' # if (e['selected']) else ''
+                        )
+                        entry_str = row_tmpl.format(
+                           attrs = self._built_attrs + css_classes,
+                           icon = e.icon_class if (e.icon_class) else '',
+                           url = e.clean_url,
+                           name = conditional_escape(e.name)
+                        )             
+                        print('entry_str:')
+                        print(str(entry_str))
+                        b.append(entry_str)
 
     def _html_output(self, row_tmpl, menu_start, menu_end):
         b = []

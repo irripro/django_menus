@@ -6,7 +6,8 @@ __version__ = '1.0.2'
 
 from .items import(
     SubMenu,
-    URL
+    URL,
+    Separator
 )
 
 from .manager import(

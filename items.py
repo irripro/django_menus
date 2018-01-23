@@ -14,7 +14,7 @@ class Separator:
 #? can reverses simply be reverse('news-year-archive', args=(year,))?
 class URL():
     validators = []
-    validated = False
+    valid = False
     attrs={}
     media = Media()
     clean_url = None
@@ -50,7 +50,7 @@ class URL():
 
     def clean(self):
         url = self.prepare_url(self.url)
-        self.validated = self.run_validators(url)
+        self.valid = self.run_validators(url)
         self.clean_url = url
 
 
