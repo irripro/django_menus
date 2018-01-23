@@ -9,7 +9,8 @@ from django.utils.safestring import mark_safe
 from ..renderers import MenuRenderer
 register = template.Library()
 
-
+from ..manager import MenuManager
+from ..menu_handler import Menu
 
 # [{'url': '/app1-feature', 'submenu': None, 'icon_class': '', 'selected': False, 'name': 'App1 Feature'}, {'url': '/about', 'submenu': None, 'icon_class': '', 'selected': False, 'name': 'About'}]
 
@@ -28,16 +29,20 @@ def get_menu(context, menu_name):
     """
     print('......get_menu')
 
-    menu_list = getattr(settings, menu_name, defaults.MENU_NOT_FOUND)
-    menu_from_apps = get_menu_from_apps(menu_name)
-    # If there isn't a menu on settings but there is menu from apps we built menu from apps
-    if menu_list == defaults.MENU_NOT_FOUND and menu_from_apps:
-        menu_list = menu_from_apps
-    # It there is a menu on settings and also on apps we merge both menus
-    elif menu_list != defaults.MENU_NOT_FOUND and menu_from_apps:
-        menu_list += menu_from_apps
-    #print(str(menu_list))
-    #return generate_menu(context['request'], menu_list)
-    visible_menu = generate_menu(context['request'], menu_list)
-    return MenuRenderer(visible_menu).as_ul()
+    #menu_list = getattr(settings, menu_name, defaults.MENU_NOT_FOUND)
+    #menu_from_apps = get_menu_from_apps(menu_name)
+    ## If there isn't a menu on settings but there is menu from apps we built menu from apps
+    #if menu_list == defaults.MENU_NOT_FOUND and menu_from_apps:
+        #menu_list = menu_from_apps
+    ## It there is a menu on settings and also on apps we merge both menus
+    #elif menu_list != defaults.MENU_NOT_FOUND and menu_from_apps:
+        #menu_list += menu_from_apps
+    ##print(str(menu_list))
+    ##return generate_menu(context['request'], menu_list)
+    #visible_menu = generate_menu(context['request'], menu_list)
+    #return MenuRenderer(visible_menu).as_ul()
+    a = MenuManager()
+    md = a.get_recursive('filmstat', 'NAV_MENU_TOP')
+    m = Menu(md)
+    return str(m)
 
