@@ -156,43 +156,7 @@ menu-item-icon
 disabled
     item marked as visible but not active
     
-'class' can be changed via the 'attrs' attribute on all menu items.
-
-
-Menu item HTML/CSS structure
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Mainly applies to the URL(), though some comments also to SubMenu(), ::
-
-    <li class=""><a href="/login"><img class="menu-item-icon"/>Login</a></li>
-
-The "menu-item-icon" class is hard-coded.
-
-The structure is unusual, and has implications for CSS. 
-
-First, you will see that the method of placing icons is an image tag. For many years the usual technique was some padding and a background image, or maybe an inserted DIV. The disadvantage of IMG is that you can not use CSS to place content ::before or ::after. So the wonderful Unicode symbols can not be used. The advantage is that the tag is semantic, and can be reliably sized. A fixed width will space the link text into a column; the only work needed is to set a margin (not padding) on all "menu-item-icon" IMGs.
-
-Second, there is no injected HTML/text to help with placing items to the right. This is because CSS still has no good way of handling this layout ('flexbox' has been massively promoted. I find it lacking). But the ancient background-image technique is good (especially as django-menu uses a written block to handle left icons), ::
-
-    background-image: url('/static/django_menus/icons/black_small_right_triangle.svg');
-    background-position: right center;
-    background-repeat: no-repeat;  
-    
-    
-Things you can do, and not do
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-CSS override
-    If you want to change colors/font-size, padding etc. See the next section. No maintenance.
-
-Change direction of menu
-    If you use bult-in CSS, easy. Add the appropriate classes. No maintenance.
-
-Insert new items to menus
-    Producing a new item is easy, look in .items.py. Rendering it currently involves modifying Menu() in .menu_handler.py. This is also easy. Not maintainable.
-    
-Modify structure of HTML
-    Currently, the app does not implement a templating system for the HTML. This makes the app easy to read and maintain, but means changing the HTML is a hardcode override. Not maintainable.
-
+The CSS 'class' can be changed via the 'attrs' attribute on all menu items.
 
 
 .. _NiceMenus: https://www.drupal.org/project/nice_menus
