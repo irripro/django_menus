@@ -128,19 +128,18 @@ These kinds of apps, this kind of code, has a habit of stating, "You can do anyt
 
 Menu HTML structure
 ~~~~~~~~~~~~~~~~~~~
-
-Menus may render as default (as_list()) as, ::
+Menus render as default, ::
 
     <ul class="dropdown">
-        <li class="active"><a href="/articles">Articles</a></li>
+        <li><a href="/articles">Articles</a></li>
         <li class="menu-item-submenu"><a href="#">About</a>
-            <ul><li class=" active"><a href="/contact">Contact</a></li>
+            <ul><li class="active><a href="/contact">Contact</a></li>
             <li class="menu-item-submenu"><a href="#">Credits</a><ul>
-            <li class=" active"><a href="/credits/now">Now</a></li>
-            <li class=" active"><a href="/credits/always">Always</a></li>
+            <li class="active"><a href="/credits/now">Now</a></li>
+            <li><a href="/credits/always">Always</a></li>
             </ul>
         </li>
-        <li class=" active"><a href="/login">Login</a></li>
+        <li><a href="/login">Login</a></li>
     </ul>
 
 Some additions to 'class' are hard-coded. These are,
