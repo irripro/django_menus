@@ -128,20 +128,7 @@ These kinds of apps, this kind of code, has a habit of stating, "You can do anyt
 
 Menu HTML structure
 ~~~~~~~~~~~~~~~~~~~
-Menus render, ::
-    
-    Sample menu
-    <ul class="dropdown">
-        <li class="active"><a href="/articles">Articles</a></li>
-        <li class="menu-item-submenu"><a href="#">About</a>
-            <ul><li class=" active"><a href="/contact">Contact</a></li>
-            <li class="menu-item-submenu"><a href="#">Credits</a><ul>
-            <li class=" active"><a href="/credits/now">Now</a></li>
-            <li class=" active"><a href="/credits/always">Always</a></li>
-            </ul>
-        </li>
-        <li class=" active"><a href="/login">Login</a></li>
-    </ul>
+Menus render,
 
 Some additions to 'class' are hard-coded. These are,
 
