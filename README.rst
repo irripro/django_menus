@@ -128,7 +128,8 @@ These kinds of apps, this kind of code, has a habit of stating, "You can do anyt
 
 Menu HTML structure
 ~~~~~~~~~~~~~~~~~~~
-Menus render as default, ::
+Menus render as default, 
+::
 
     <ul class="dropdown">
         <li><a href="/articles">Articles</a></li>
