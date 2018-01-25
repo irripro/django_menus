@@ -144,20 +144,6 @@ Menus may render as default (as_list()) as, ::
 
 Some additions to 'class' are hard-coded. These are,
 
-active
-    item marked as part of the current URL
-
-menu-item-submenu
-    item marked as a container for a submenu
-    
-menu-item-icon
-    included on the icon image tag
-     
-disabled
-    item marked as visible but not active
-    
-The CSS 'class' can be changed via the 'attrs' attribute on all menu items.
-
 
 .. _NiceMenus: https://www.drupal.org/project/nice_menus
 
