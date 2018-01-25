@@ -120,6 +120,30 @@ Menus have no surrounding div, ul, or table tags. These need adding, something l
     <ul>
       {{ site_menu }}
     </ul>
+        
+Modifying
+---------
+These kinds of apps, this kind of code, has a habit of stating, "You can do anything with our code!" This app is for Django, an MVC framework, so this is true. But there is a limit beyond which you are hacking the app, not configuring. Pehaps the following will help.
+
+
+Menu HTML structure
+~~~~~~~~~~~~~~~~~~~
+
+Menus may render as default (as_list()) as, ::
+
+    <ul class="dropdown">
+        <li class="active"><a href="/articles">Articles</a></li>
+        <li class="menu-item-submenu"><a href="#">About</a>
+            <ul><li class=" active"><a href="/contact">Contact</a></li>
+            <li class="menu-item-submenu"><a href="#">Credits</a><ul>
+            <li class=" active"><a href="/credits/now">Now</a></li>
+            <li class=" active"><a href="/credits/always">Always</a></li>
+            </ul>
+        </li>
+        <li class=" active"><a href="/login">Login</a></li>
+    </ul>
+
+Some additions to 'class' are hard-coded. These are,
 
 
 .. _NiceMenus: https://www.drupal.org/project/nice_menus
