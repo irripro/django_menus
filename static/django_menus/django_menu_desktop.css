@@ -1,0 +1,57 @@
+
+/*
+ * ? Transparent
+ */ 
+.dm-desktop {
+    font-size: 14px;
+    line-height: 24px;
+    background-color: #ddd;
+    text-shadow: 1px 1px 2px #fff;
+}
+
+.dm-desktop a {
+    color: #000;
+    text-decoration: none;
+}
+
+.dm-desktop > li {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.dm-desktop > li > a {
+    padding: 0 8px;
+}
+
+.dm-desktop ul li {
+    text-align: left;
+    border: 1px solid #f7f7f7;
+}
+
+.dm-desktop li:hover {
+    background-color: #8a6;
+    border: 1px solid #969696;
+}
+
+.dm-desktop li:hover > a {
+    color: #fff;
+    text-shadow: none;
+}
+
+.dm-desktop ul {
+    /* Sets the width of menu items. Adjust to suit */
+    min-width: 8em;
+    background-color: #f7f7f7;
+    border: 1px solid #969696;
+}
+
+.dm-desktop ul .menu-item-icon {
+    width: 14px;
+    margin: 0 2px;
+}
+
+.dm-desktop ul .menu-item-submenu {
+    background-image: url('/static/django_menus/icons/black_small_right_triangle.svg');
+    background-position: right center;
+    background-repeat: no-repeat;
+}

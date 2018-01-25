@@ -1,0 +1,39 @@
+
+/*
+ * Probably looks better in sans with font about 14px
+ */ 
+.dm-toocool {
+    text-align: center;
+    background-color: #fff;    
+    font-size: 14px;
+}
+
+.dm-toocool a {
+    color: #666;
+    text-decoration: none;
+    padding: 10px 0;
+}
+
+.dm-toocool > li > a {
+    font-size: 17px;
+    text-transform: uppercase;
+    padding: 15px 25px;
+    display:block;
+}
+
+.dm-toocool ul {
+    /* Sets the width of menu items. Adjust to suit */
+    min-width: 180px;
+    padding: 15px 0;
+    box-shadow: 0 2px 0 0 #c23 inset,0 3px 5px rgba(0,0,0,0.05);
+    background-color: #fff;    
+}
+
+.dm-toocool ul li {
+    border-bottom: 2px solid #fff;
+}
+
+.dm-toocool ul li:hover {
+    background: #f3f3f3;
+    border-bottom: 2px solid #c23;
+}

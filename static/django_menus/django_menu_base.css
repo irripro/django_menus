@@ -1,0 +1,70 @@
+
+/*
+ * Basic machinery of the menus.
+ * This file only does the positioning of menu items (and so
+ * definitions of 'display').
+ * Only one setting affects non-box-positioning. The width of the 
+ * elements cascades down. If the width is too narrow, elements inside a
+ * menu item will stack. To prevent visual confusion, list items set 
+ * white-space: nowrap;.
+ * Include wherever the menus are used.
+ * Don't change unless you want to replace the system
+ * (e.g. implement Javascript actions).
+ * This is tricky CSS. Every line has a big effect. 
+ * Several settings are designed to cascade down the HTML structure.
+ * If you change, be prepared for the display to collapse.
+ */ 
+/*******************************
+ CSS for subsequent menu styling
+********************************/
+.dmenu {
+    box-sizing: border-box;
+    margin: 0;
+}
+
+.dmenu li {
+    white-space: nowrap;
+    position: relative;
+}
+
+.dmenu-horizontal > li {
+    display: inline-block;
+    /* width:4em; */
+}
+
+.dmenu-horizontal > li > ul {
+    top:100%;
+    left: 0;
+    right: 0;
+}
+
+.dmenu ul {
+    display: none;
+    position: absolute;
+    margin: 0;
+    width:100%;
+    z-index: 4;
+}
+
+.dmenu-left ul {
+    top:0;
+    right: 100%;
+}
+
+.dmenu-right ul {
+    top:0;
+    left: 100%;
+}
+
+.dmenu-down ul {
+    top:100%;
+}
+
+.dmenu li:hover > ul {
+    display: block;
+}
+
+.dmenu ul li {
+    display: block;
+}
+

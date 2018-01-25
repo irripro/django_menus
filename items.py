@@ -7,13 +7,13 @@ class SubMenu():
     
     def __init__(self, name, url, menu_ref,
             icon_ref=None, 
-            icon_submenu_ref=None,
+            expanded=False
         ):
         self.menu_ref = menu_ref
         self.name = name
         self.url = url
         self.icon_ref = icon_ref
-        self.icon_submenu_ref = icon_submenu_ref
+        self.expanded=expanded
 
 class Separator:
     pass
