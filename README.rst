@@ -100,9 +100,8 @@ Unlike much of my Django code, this app originated in other code, a Django appli
 https://pypi.python.org/pypi/django-menu-generator/1.0.2
 https://github.com/un33k/django-menuware
 
-There are also some hints taken from,
+There are also some hints taken from the Drupal module NiceMenus_.
 
-https://www.drupal.org/project/nice_menus
 
 Current state
 -------------
@@ -143,18 +142,18 @@ Menus may render as default (as_list()) as, ::
         <li class=" active"><a href="/login">Login</a></li>
     </ul>
 
-Some additions to 'class' are hard-coded. These are, ;;
+Some additions to 'class' are hard-coded. These are,
 
-'active'
+active
     item marked as part of the current URL
 
-'menu-item-submenu'
+menu-item-submenu
     item marked as a container for a submenu
     
-'menu-item-icon'
+menu-item-icon
     included on the icon image tag
      
-'disabled'
+disabled
     item marked as visible but not active
     
 'class' can be changed via the 'attrs' attribute on all menu items.
@@ -264,9 +263,13 @@ So,
     :alt: searchbox screenshot
     :align: center
     
-    Not flashy
+Not flashy
     
     
 Fun things you can do
 ~~~~~~~~~~~~~~~~~~~~~
 Translucent menu :) (why, why do I even suggest this?)
+
+
+.. _NiceMenus: https://www.drupal.org/project/nice_menus
+
