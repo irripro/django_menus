@@ -128,9 +128,9 @@ These kinds of apps, this kind of code, has a habit of stating, "You can do anyt
 
 Menu HTML structure
 ~~~~~~~~~~~~~~~~~~~
-Menus may render as default (as_list()) as, ::
-
-    <!-- sample menu -->
+Menus render, ::
+    
+    Sample menu
     <ul class="dropdown">
         <li class="active"><a href="/articles">Articles</a></li>
         <li class="menu-item-submenu"><a href="#">About</a>
