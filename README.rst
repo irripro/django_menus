@@ -258,18 +258,5 @@ Then add the class inside the file to the wrapping UL tags, ::
 So,
 
 
-.. figure:: https://raw.githubusercontent.com/rcrowther/django_menus/master/docs/images/desktop_menu.png
-    :width: 160 px
-    :alt: searchbox screenshot
-    :align: center
-    
-Not flashy
-    
-    
-Fun things you can do
-~~~~~~~~~~~~~~~~~~~~~
-Translucent menu :) (why, why do I even suggest this?)
-
-
 .. _NiceMenus: https://www.drupal.org/project/nice_menus
 
