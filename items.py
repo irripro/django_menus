@@ -10,11 +10,16 @@ from django.utils.html import conditional_escape, html_safe, format_html
 
 class MenuItem:
     str_tmpl = None
-    #attrs = {}
+    wrap_css_classes = ''
+    selected = False
+    expanded = False
+    disabled = False
 
-    #def __init__(self, attrs=None):
-        #if attrs is not None:
-        #    self.attrs = attrs.copy()
+    def __init__(self, expanded=False, disabled=False):
+        if (expanded):
+            self.expanded = expanded
+        if (disabled):
+            self.disabled = disabled
 
     #? handy?
     def absolute_path(self, path):
@@ -48,10 +53,10 @@ class MenuItem:
         return mark_safe(self.str_tmpl.format(**ctx))
 
 
-
 class URLMenuItem(MenuItem):
     #? will be absolute
     #? will test for nothing? But then not run validators?
+
     def prepare_url(self, url):
         return url
         
@@ -71,7 +76,27 @@ class URLMenuItem(MenuItem):
             url = self.prepare_url(self.url)
             self.valid = self.run_validators(url)
             self.clean_url = url
-        
+
+
+    #! Get selectors going
+    #! what is path absolute?
+    #! match whole or part?
+    def match_url(self, path):
+        """
+        match url determines if this is selected
+        """
+        matched = False
+        if (not self.clean_url):
+             raise ImproperlyConfigured('match_url requested before validation')
+        #if self.exact_url:
+        #    if re.match("%s$" % (self.url,), request.path):
+        #        matched = True
+        #elif re.match("%s" % self.url, request.path):
+        if re.match("%s" % self.clean_url, path):
+            matched = True
+        return matched
+              
+              
     def _rend_icon(self, icon_ref):
         #icon = '<img class="menu-item-icon">' 
         icon = '<svg class="menu-item-icon" xmlns="http://www.w3.org/2000/svg" width="0" height="0" viewBox="0 0 0 0" ></svg>'
@@ -88,24 +113,6 @@ class URLMenuItem(MenuItem):
             name = conditional_escape(self.name)
         );
         
-        
-                    
-#! must do all the URL/attr gear of URL
-class SubMenu(URLMenuItem):
-    str_tmpl = '<a href="{url}">{icon}{name}</a>'
-    submenu = None
-    clean_url = None
-    
-    def __init__(self, name, url, menu_ref,
-            icon_ref=None, 
-            expanded=False
-        ):
-        self.menu_ref = menu_ref
-        self.name = name
-        self.url = url
-        self.icon_ref = icon_ref
-        self.expanded=expanded
-
 
 
 class Separator(MenuItem):
@@ -115,8 +122,24 @@ class Separator(MenuItem):
     #    super().__init__(attrs)
     def get_context(self, path):
         return {};  
-  
-  
+          
+                    
+#! must do all the URL/attr gear of URL
+class SubMenu(URLMenuItem):
+    str_tmpl = '<a href="{url}">{icon}{name}</a>'
+    submenu = None
+    clean_url = None
+    wrap_css_classes = 'submenu'
+    
+    def __init__(self, name, url, menu_ref,
+            icon_ref=None, 
+            expanded=False, disabled=False,
+        ):
+        self.menu_ref = menu_ref
+        self.name = name
+        self.url = url
+        self.icon_ref = icon_ref
+        super().__init__(expanded, disabled)
 
   
   
@@ -133,36 +156,19 @@ class URL(URLMenuItem):
     def __init__(self, name, url,
         icon_ref=None, 
         localize=False, 
-        disabled=False,
         validators=[],
-        attrs={}
+        expanded=False, disabled=False,
         ):
         self.name = name
         self.url = url
         self.icon_ref = icon_ref
         self.localize = localize
-        self.disabled = disabled
         if (validators):
             #! chain, if we stick with lists
             self.validators = validators
-        self.attrs.update(attrs)
+        super().__init__(expanded, disabled)
         
 
-
-    def match_url(self, request):
-        """
-        match url determines if this is selected
-        """
-        matched = False
-        if (not self.clean_url):
-             raise ImproperlyConfigured('match_url requested before validation')
-        #if self.exact_url:
-        #    if re.match("%s$" % (self.url,), request.path):
-        #        matched = True
-        #elif re.match("%s" % self.url, request.path):
-        if re.match("%s" % self.clean_url, request.path):
-            matched = True
-        return matched
 
     #def _rend_icon(self, icon_ref):
         ##icon = '<img class="menu-item-icon">' 

@@ -56,7 +56,7 @@
     border-bottom: 1px solid #fff;
 }
 
-.dm-desktop ul .menu-item-submenu {
+.dm-desktop ul .submenu {
     background-image: url('/static/django_menus/icons/black_small_right_triangle.svg');
     background-position: right center;
     background-repeat: no-repeat;

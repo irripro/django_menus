@@ -16,12 +16,16 @@ from .items import URL, SubMenu, Separator
 
 #! media
 #! 'active' not enabled
+#? theres a difference between 'hover/link/active/visited' and 'currently selected'.
+#? Do we want 'currently selected' at all? What's web 'active'?
 #! icon_ref
 #! disabled
-#! Separator
+#! expanded/disabled on whole menus as option
+#! Separator is a LI item?
 #! item attrs
 #! attrs shoud be default, if not item overriden?
 #! since template filters only take one parameter, namespacing, or auto-app detection?
+#? expanded Drupal-like theme
 class Menu():
     """
     Base class that generates menu list.
@@ -51,41 +55,35 @@ class Menu():
                 self._css_classes = self._css_classes + ' ' + css_classes
             else:
                 self._css_classes = css_classes
-              
-        if (not attrs):
-            #! chain
-            attrs = self.attrs
-        self._built_attrs =  self._build_attrs(attrs)
 
-    #def clean(self):
-        #for e in menu:
-            #if (isinstance(e, URL)):
-                #e.clean()
+        self.attrs.update(attrs)
 
+    
     def _build_attrs(self, attrs):
         b = []         
         for k,v in attrs.items():
             b.append('{0}="{1}"'.format(k, v))
         return ' '.join(b)
-        
-    def _rend_css_classes(self, extra_class_names=''):
-        classes = self._css_classes
-        if (classes and extra_class_names):
-            extra_class_names = ' ' + extra_class_names
-        classes = classes + extra_class_names
-        if (not classes):
-            return ''
-        else:
-            return 'class="{}"'.format(classes)
+    
+    #! if classes is empty string?    
+    def _rend_attrs(self, menu_item):
+        classes = []
+        if (menu_item.selected):
+            classes.append('selected') 
+        if (menu_item.expanded):
+            classes.append('expanded')
+        if (menu_item.disabled):
+            classes.append('disabled')
+        classes.append(menu_item.wrap_css_classes) 
 
-    def _rend_icon(self, icon_ref):
-        #icon = '<img class="menu-item-icon">' 
-        icon = '<svg class="menu-item-icon" xmlns="http://www.w3.org/2000/svg" width="0" height="0" viewBox="0 0 0 0" ></svg>'
-        if (icon_ref is not None):
-            icon = '<img class="menu-item-icon" src="{}" />'.format(
-            icon_ref
-            )
-        return icon
+        if (classes):
+            local_classes = self.attrs.get('class')
+            if (local_classes):
+                classes.append(local_classes)
+            attrs = self.attrs.copy()
+            attrs['class'] = ' '.join(classes)
+        return self._build_attrs(attrs)
+
                                     
     #! test 'active'
     def _html_output_recursive(self, b, menu, 
@@ -95,17 +93,17 @@ class Menu():
         item_end
     ):
         "Output HTML. Used by as_table(), as_ul(), as_p()."
+        #? extra classes: selected, expanded, disabled?, submenu  
+        # so triggered by  selected, expanded,
         for e in menu:
             #print('rend:')
             #print(str(e))
 
             if (isinstance(e, Separator)):
-                print('rend Separator:')
-                #print(str(entry_str))
-                #b.append('<hr/>')
+                #print('rend Separator:')
                 b.append(e.render(self.request_path))
-            elif (isinstance(e, SubMenu)):                
-                b.append(item_start.format(attrs = self._built_attrs + self._rend_css_classes('menu-item-submenu')))
+            elif (isinstance(e, SubMenu)): 
+                b.append(item_start.format(attrs = self._rend_attrs(e)))
                 b.append(e.render(self.request_path))
                 b.append(menu_start)
                 self._html_output_recursive(b, e.submenu,
@@ -117,7 +115,7 @@ class Menu():
                 b.append(menu_end)
                 b.append(item_end)
             elif (isinstance(e, URL)):
-                icon = self._rend_icon(e.icon_ref)
+                #! in items
                 e.clean()
                 if (not e.valid):
                     #? This gear should be in the item
@@ -125,7 +123,7 @@ class Menu():
                        self._css_classes,
                        ' disabled'
                     )
-                    b.append(item_start.format(attrs = self._built_attrs + css_classes))                    
+                    b.append(item_start.format(attrs = self._rend_attrs(e)))
                     b.append(e.render(self.request_path))
                     b.append(entry_str)                        
                 else:
@@ -134,7 +132,7 @@ class Menu():
                        self._css_classes,
                        ' active' # if (e['selected']) else ''
                     )
-                    b.append(item_start.format(attrs = self._built_attrs + css_classes))
+                    b.append(item_start.format(attrs = self._rend_attrs(e)))
                     b.append(e.render(self.request_path))
                     b.append(item_end)
 
