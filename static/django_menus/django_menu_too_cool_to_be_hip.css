@@ -37,3 +37,9 @@
     background: #f3f3f3;
     border-bottom: 2px solid #c23;
 }
+
+.dm-toocool hr {
+    margin: 10px 0;
+    border-top: 1px solid #bbb;
+    border-bottom: 1px solid #fff;
+}

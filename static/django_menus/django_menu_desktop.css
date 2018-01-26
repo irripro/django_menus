@@ -50,6 +50,12 @@
     margin: 0 2px;
 }
 
+.dm-desktop hr {
+    margin: 2px 0;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #fff;
+}
+
 .dm-desktop ul .menu-item-submenu {
     background-image: url('/static/django_menus/icons/black_small_right_triangle.svg');
     background-position: right center;

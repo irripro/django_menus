@@ -14,8 +14,6 @@ from django.utils.html import conditional_escape, html_safe, format_html
 
 from .items import URL, SubMenu, Separator
 
-#! rethink HTML
-#! build basic CSS
 #! media
 #! 'active' not enabled
 #! icon_ref
@@ -39,7 +37,10 @@ class Menu():
     _built_attrs = ''
     _css_classes = ''
 
-    def __init__(self, menu=None, empty_permitted=False, attrs={}):
+    def __init__(self, request_path, menu=None, empty_permitted=False, attrs={}):
+        self.request_path = request_path
+        print('..........request_path:')
+        print(str(request_path))
         self.path = ''
         self.request = None
         self.menu = [] if menu is None else menu
@@ -87,7 +88,7 @@ class Menu():
         return icon
                                     
     #! test 'active'
-    def _html_output_recursive(self, b, menu, row_tmpl, 
+    def _html_output_recursive(self, b, menu, 
         menu_start, 
         menu_end, 
         item_start,
@@ -95,29 +96,23 @@ class Menu():
     ):
         "Output HTML. Used by as_table(), as_ul(), as_p()."
         for e in menu:
-            print('rend:')
-            print(str(e))
+            #print('rend:')
+            #print(str(e))
 
             if (isinstance(e, Separator)):
                 print('rend Separator:')
                 #print(str(entry_str))
-                b.append('<hr/>')
-            elif (isinstance(e, SubMenu)):
-                open_row_tmpl='<li {attrs}><a href="{url}">{icon}{name}</a>'
-                entry_str = open_row_tmpl.format(
-                   attrs = self._built_attrs + self._rend_css_classes('menu-item-submenu'),
-                   icon = self._rend_icon(e.icon_ref),
-                   url = e.url,
-                   #submenu_icon = submenu_icon,
-                   name = conditional_escape(e.name),
-                )                  
-                b.append(entry_str)                 
+                #b.append('<hr/>')
+                b.append(e.render(self.request_path))
+            elif (isinstance(e, SubMenu)):                
+                b.append(item_start.format(attrs = self._built_attrs + self._rend_css_classes('menu-item-submenu')))
+                b.append(e.render(self.request_path))
                 b.append(menu_start)
-                self._html_output_recursive(b, e.submenu, row_tmpl, 
-                menu_start,
-                 menu_end,
-                item_start,
-                item_end
+                self._html_output_recursive(b, e.submenu,
+                    menu_start,
+                    menu_end,
+                    item_start,
+                    item_end
                 )
                 b.append(menu_end)
                 b.append(item_end)
@@ -125,34 +120,27 @@ class Menu():
                 icon = self._rend_icon(e.icon_ref)
                 e.clean()
                 if (not e.valid):
+                    #? This gear should be in the item
                     css_classes = 'class="{}{}"'.format(
                        self._css_classes,
                        ' disabled'
                     )
-                    entry_str = '<li {attrs}>{icon}{name}</li>'.format(
-                       attrs = self._built_attrs + css_classes,
-                       icon = icon,
-                       name = conditional_escape(e.name),
-                    )
+                    b.append(item_start.format(attrs = self._built_attrs + css_classes))                    
+                    b.append(e.render(self.request_path))
                     b.append(entry_str)                        
                 else:
+                    #? This gear should be in the item
                     css_classes = 'class="{}{}"'.format(
                        self._css_classes,
                        ' active' # if (e['selected']) else ''
                     )
-                    entry_str = row_tmpl.format(
-                       attrs = self._built_attrs + css_classes,
-                       icon = icon,
-                       url = e.clean_url,
-                       name = conditional_escape(e.name)
-                    )             
-                    #print('entry_str:')
-                    #print(str(entry_str))
-                    b.append(entry_str)
+                    b.append(item_start.format(attrs = self._built_attrs + css_classes))
+                    b.append(e.render(self.request_path))
+                    b.append(item_end)
 
-    def _html_output(self, row_tmpl, menu_start, menu_end, item_start, item_end):
+    def _html_output(self, menu_start, menu_end, item_start, item_end):
         b = []
-        self._html_output_recursive(b, self.menu, row_tmpl, 
+        self._html_output_recursive(b, self.menu, 
         menu_start, 
         menu_end,
         item_start,
@@ -163,20 +151,18 @@ class Menu():
     def as_ul(self):
         "Return this menu rendered as HTML <li>s -- excluding the <ul></ul>."
         return self._html_output(
-            row_tmpl='<li {attrs}><a href="{url}">{icon}{name}</a></li>',
             menu_start = '<ul>',
             menu_end = '</ul>',
-            item_start = '<li {attrs}><a href="{url}">{icon}{name}</a>',
+            item_start = '<li {attrs}>',
             item_end = '</li>'
             )
 
     def as_div(self):
         "Return this menu rendered as HTML <div>s -- excluding a wrapping <div></div>."
         return self._html_output(
-            row_tmpl='<div {attrs}><a href="{url}">{icon}{name}</a></div>',
             menu_start = '<div class="submenu">',
             menu_end = '</div>',
-            item_start = '<div {attrs}><a href="{url}">{icon}{name}</a>',
+            item_start = '<div {attrs}>',
             item_end = '</div>'
             )
             
