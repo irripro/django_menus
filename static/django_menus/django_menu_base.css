@@ -56,11 +56,9 @@
     left: 100%;
 }
 
-.dmenu-down ul {
-    top:100%;
-}
 
-.dmenu li:hover > ul {
+
+.dmenu li:hover > ul, .dmenu .expanded > ul {
     display: block;
 }
 
@@ -68,3 +66,20 @@
     display: block;
 }
 
+/* Push-down styles (different namespace) */
+.dmenu-down {
+    box-sizing: border-box;
+    margin: 0;
+}
+
+.dmenu-down li {
+    white-space: word-wrap;
+}
+
+.dmenu-down ul {
+    display: none;
+}
+
+.dmenu-down li:hover > ul, .dmenu-down .expanded > ul {
+    display: block;
+}

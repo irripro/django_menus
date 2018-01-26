@@ -41,12 +41,11 @@ class Menu():
     _built_attrs = ''
     _css_classes = ''
 
-    def __init__(self, request_path, menu=None, empty_permitted=False, attrs={}):
-        self.request_path = request_path
-        print('..........request_path:')
-        print(str(request_path))
+    def __init__(self, request, menu=None, empty_permitted=False, attrs={}):
+        self.request = request
+        print('..........request:')
+        print(str(request))
         self.path = ''
-        self.request = None
         self.menu = [] if menu is None else menu
         self.empty_permitted = empty_permitted
         css_classes = attrs.pop('class', None)
@@ -101,10 +100,11 @@ class Menu():
 
             if (isinstance(e, Separator)):
                 #print('rend Separator:')
-                b.append(e.render(self.request_path))
+                b.append(e.render(self.request))
             elif (isinstance(e, SubMenu)): 
+                e.clean()
                 b.append(item_start.format(attrs = self._rend_attrs(e)))
-                b.append(e.render(self.request_path))
+                b.append(e.render(self.request))
                 b.append(menu_start)
                 self._html_output_recursive(b, e.submenu,
                     menu_start,
@@ -124,7 +124,7 @@ class Menu():
                        ' disabled'
                     )
                     b.append(item_start.format(attrs = self._rend_attrs(e)))
-                    b.append(e.render(self.request_path))
+                    b.append(e.render(self.request))
                     b.append(entry_str)                        
                 else:
                     #? This gear should be in the item
@@ -133,7 +133,7 @@ class Menu():
                        ' active' # if (e['selected']) else ''
                     )
                     b.append(item_start.format(attrs = self._rend_attrs(e)))
-                    b.append(e.render(self.request_path))
+                    b.append(e.render(self.request))
                     b.append(item_end)
 
     def _html_output(self, menu_start, menu_end, item_start, item_end):

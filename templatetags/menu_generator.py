@@ -43,6 +43,6 @@ def get_menu(context, menu_name):
     #return MenuRenderer(visible_menu).as_ul()
     a = MenuManager()
     md = a.get_recursive('filmstat', 'NAV_MENU_TOP')
-    m = Menu(context.request.path, md)
+    m = Menu(context.request, md)
     return str(m)
 

@@ -8,6 +8,9 @@ from django.templatetags.static import static
 from django.utils.html import conditional_escape, html_safe, format_html
 
 
+#! need a distinction beteween data given as options
+#! ans later calculated (e.g. auto expanding)
+#? use auto-attributed kwargs
 class MenuItem:
     str_tmpl = None
     wrap_css_classes = ''
@@ -45,18 +48,27 @@ class MenuItem:
         #else:
             #self.attrs['class'] = '{} {}'.format(self.attrs['class'], name)
  
-    def get_context(self, path):
+    def get_context(self, request):
         pass
         
-    def render(self, path=None):
-        ctx = self.get_context(path)
+    def render(self, request=None):
+        ctx = self.get_context(request)
         return mark_safe(self.str_tmpl.format(**ctx))
 
 
 class URLMenuItem(MenuItem):
     #? will be absolute
     #? will test for nothing? But then not run validators?
+    validators = []
 
+    def __init__(self, validators=[],
+expanded=False, disabled=False):
+        if (expanded):
+            self.expanded = expanded
+        if (disabled):
+            self.disabled = disabled
+        super().__init__(expanded=expanded, disabled=disabled)
+        
     def prepare_url(self, url):
         return url
         
@@ -85,6 +97,9 @@ class URLMenuItem(MenuItem):
         """
         match url determines if this is selected
         """
+        #if request.user.is_authenticated:
+        print('slct path:')
+        print(str(path))
         matched = False
         if (not self.clean_url):
              raise ImproperlyConfigured('match_url requested before validation')
@@ -92,6 +107,9 @@ class URLMenuItem(MenuItem):
         #    if re.match("%s$" % (self.url,), request.path):
         #        matched = True
         #elif re.match("%s" % self.url, request.path):
+        
+        #! not good enough. 
+        # What about slashes? hash ends?
         if re.match("%s" % self.clean_url, path):
             matched = True
         return matched
@@ -106,7 +124,10 @@ class URLMenuItem(MenuItem):
             )
         return icon
         
-    def get_context(self, path):
+    def get_context(self, request):
+        #? do this kind of thing somewhere else?
+        self.selected = self.match_url(request.path_info)
+        
         return dict(
             icon = self._rend_icon(self.icon_ref),
             url = self.clean_url,
@@ -120,7 +141,7 @@ class Separator(MenuItem):
 
     #def __init__(self, attrs=None):
     #    super().__init__(attrs)
-    def get_context(self, path):
+    def get_context(self, request):
         return {};  
           
                     
@@ -132,14 +153,15 @@ class SubMenu(URLMenuItem):
     wrap_css_classes = 'submenu'
     
     def __init__(self, name, url, menu_ref,
-            icon_ref=None, 
+            icon_ref=None,
+            validators=[], 
             expanded=False, disabled=False,
         ):
         self.menu_ref = menu_ref
         self.name = name
         self.url = url
         self.icon_ref = icon_ref
-        super().__init__(expanded, disabled)
+        super().__init__(validators, expanded, disabled)
 
   
   
@@ -155,8 +177,8 @@ class URL(URLMenuItem):
     
     def __init__(self, name, url,
         icon_ref=None, 
-        localize=False, 
         validators=[],
+        localize=False,
         expanded=False, disabled=False,
         ):
         self.name = name
@@ -166,7 +188,7 @@ class URL(URLMenuItem):
         if (validators):
             #! chain, if we stick with lists
             self.validators = validators
-        super().__init__(expanded, disabled)
+        super().__init__(validators, expanded, disabled)
         
 
 

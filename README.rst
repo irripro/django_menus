@@ -130,16 +130,16 @@ Menu HTML structure
 ~~~~~~~~~~~~~~~~~~~~~~~
 Menus may render as default (as_list()) as, ::
 
-    <ul class="dropdown">
-        <li class="active"><a href="/articles">Articles</a></li>
-        <li class="menu-item-submenu"><a href="#">About</a>
-            <ul><li class=" active"><a href="/contact">Contact</a></li>
-            <li class="menu-item-submenu"><a href="#">Credits</a><ul>
-            <li class=" active"><a href="/credits/now">Now</a></li>
-            <li class=" active"><a href="/credits/always">Always</a></li>
+    <ul class="dmenu dmenu-right">
+        <li><a href="/articles">Articles</a></li>
+        <li class="submenu"><a href="#">About</a>
+            <ul><li class="expanded"><a href="/contact">Contact</a></li>
+            <li class="submenu"><a href="#">Credits</a><ul>
+            <li class="selected"><a href="/credits/now">Now</a></li>
+            <li><a href="/credits/always">Always</a></li>
             </ul>
         </li>
-        <li class=" active"><a href="/login">Login</a></li>
+        <li><a href="/login">Login</a></li>
     </ul>
 
 Some additions to 'class' are hard-coded. These are,
@@ -147,25 +147,27 @@ Some additions to 'class' are hard-coded. These are,
 active
     item marked as part of the current URL
 
-menu-item-submenu
+submenu
     item marked as a container for a submenu
     
-menu-item-icon
-    included on the icon image tag
-     
+icon
+    item marked as the icon image tag
+
+expanded
+    open this branch whatever the GUI state
+    
 disabled
     item marked as visible but not active
-    
-'class' can be changed via the 'attrs' attribute on all menu items.
+
 
 
 Menu item HTML/CSS structure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Mainly applies to the URL(), though some comments also to SubMenu(), ::
 
-    <li class=""><a href="/login"><img class="menu-item-icon"/>Login</a></li>
+    <li class=""><a href="/login"><img class="icon"/>Login</a></li>
 
-The "menu-item-icon" class is hard-coded.
+The "icon" class is hard-coded.
 
 The structure is unusual, and has implications for CSS. 
 
@@ -198,15 +200,15 @@ Default CSS, and overriding
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 WARNING
 +++++++
-Styling a CSS menu is advanced. For example, the menu needs space before item text. But most menus do not need spacing before top-level horizontal items (no icons there, usually). You can, to add space, set a width on the embedded icon IMG. To avoid the top level, you can select the horizontal menu, and kill top-level spacing, or select only submenus, or go down a level e.g. .dm-desktop ul .menu-item-icon {width: 14px; margin: 0 2px;}.
+Styling a CSS menu is advanced. For example, the menu needs space before item text. But most menus do not need spacing before top-level horizontal items (no icons there, usually). You can, to add space, set a width on the embedded icon IMG. To avoid the top level, you can select the horizontal menu, and kill spacing, or select only submenus to space, or go down a level e.g. .dm-desktop ul .menu-item-icon {width: 14px; margin: 0 2px;}.
 
 Anchors often have browser styling, and need direct selection. If you want to customise a submenu mark, it's a background image, and you need a .png at least, which can be difficult to position without 'vertical-align'. If borders are added to items, the alignment will walk up and down, depending on the box-model. 
 
-Yo may work faster if you copy and modify. If you do not do this as a day job, it can take considerable time.
+You may work faster if you copy and modify. If you do not do this as a day job, it can take considerable time.
 
 After warning
 +++++++++++++
-The menu tags, or a cotext injection, deliver a pre-rendered menu HTML. This, in a browser, looks promising (if you are a glass-half-full person) but is not finished product.
+The menu tags, or a context injection, deliver a pre-rendered menu HTML. This, in a browser, looks promising (if you are a glass-half-full person) but is not finished product.
 
 django_menus comes with a CSS structure built-in. This is delivered by default through Media statements (as used by Django Forms). Which means you can keep as much as you want, or override.
 
@@ -229,7 +231,7 @@ django_menu_base.css delivers basic positioning for a menu. Say a menu 'SITE_MEN
           {{ site_menu }}
         </ul>
         
-If you have a look, this is raw, but promising. Now import the CSS as described above, and add these classes to the wrapping UL tags, ::
+If you have a look, the menu output is raw, but promising. Now import the CSS as described above, and add these classes to the wrapping UL tags, ::
 
         {% load menu_generator %}
 
@@ -238,8 +240,19 @@ If you have a look, this is raw, but promising. Now import the CSS as described 
           {{ site_menu }}
         </ul>        
         
-Any depth in the menu will disappear. 'dmenu' sets all the basic hide/show/hover action. 'dmenu-right' opens to the right ('dmenu-left' to the left, 'dmenu-down' downwards). 'dmenu-horizontal' sets the first entries in the menu horizontal (or do not put this in, and have a vertical menu).
+Any depth in the menu will disappear (which is correct, don't panic).
 
+'dmenu' sets all the basic hide/show/hover action. 'dmenu-right' opens to the right ('dmenu-left' to the left). 'dmenu-horizontal' sets the first entries in the menu horizontal (or do not put this in, and have a vertical menu).
+
+There is an alternative set of mechanics. This produces a push-down menu, ::
+
+        {% load menu_generator %}
+
+        {% get_menu "SITE_MENU" as site_menu %}
+        <ul class="dmenu-down">
+          {{ site_menu }}
+        </ul>  
+        
 The menu looks tidier. More importantly, if you hover elements, you will find the menu operates as you asked. But it looks... basic. The menu may open in wild positions (these classes set no widths).
 
 You can add your own CSS, via Media or directly. Or you can have a look at the sample themes. Themes are in django_menu/static/... Add this to load one, ::
@@ -260,12 +273,34 @@ So,
 
 .. figure:: https://raw.githubusercontent.com/rcrowther/django_menus/master/docs/images/desktop_menu.png
     :width: 160 px
-    :alt: searchbox screenshot
+    :alt: menu screenshot
     :align: center
     
-Not flashy
+Not flashy.
+
+Ok, let's try a push-down theme, ::
     
+    <link href={% static 'django_menus/django_menu_machinery.css' %} type="text/css" media="all" rel="stylesheet">
+
+
+    {% load menu_generator %}
+
+    {% get_menu "SITE_MENU" as site_menu %}
+    <ul class="dmenu-down dm-machinery">
+      {{ site_menu }}
+    </ul> 
+
+So,
+
+.. figure:: https://raw.githubusercontent.com/rcrowther/django_menus/master/docs/images/machinery_menu.png
+    :width: 160 px
+    :alt: menu screenshot
+    :align: centre
     
+Maybe pushing it, huh, son?
+            
+            
+  
 Fun things you can do
 ~~~~~~~~~~~~~~~~~~~~~
 Translucent menu :) (why, why do I even suggest this?)
