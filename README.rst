@@ -295,7 +295,7 @@ So,
 .. figure:: https://raw.githubusercontent.com/rcrowther/django_menus/master/docs/images/machinery_menu.png
     :width: 160 px
     :alt: menu screenshot
-    :align: centre
+    :align: center
     
 Maybe pushing it, huh, son?
             
