@@ -124,16 +124,21 @@ expanded=False, disabled=False):
             )
         return icon
         
+    def disable(self, ctx):
+        ctx['url'] = '#'
+        self.wrap_css_classes += 'disabled'
+        
     def get_context(self, request):
         #? do this kind of thing somewhere else?
         self.selected = self.match_url(request.path_info)
-        
-        return dict(
+        ctx = dict(
             icon = self._rend_icon(self.icon_ref),
             url = self.clean_url,
             name = conditional_escape(self.name)
-        );
-        
+        )
+        if (self.disabled):
+            self.disable(ctx)
+        return ctx
 
 
 class Separator(MenuItem):

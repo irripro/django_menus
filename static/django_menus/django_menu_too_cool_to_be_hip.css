@@ -43,3 +43,13 @@
     border-top: 1px solid #bbb;
     border-bottom: 1px solid #fff;
 }
+
+.dm-toocool .disabled a, .dm-desktop .disabled:hover > a {
+    color: #ccc;
+    cursor: default;
+}
+
+.dm-toocool .disabled:hover {
+    background-color: #fff;    
+    border-bottom: 2px solid #fff;
+}

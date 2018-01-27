@@ -7,7 +7,7 @@ from .utils import get_callable
 
 from django.conf import settings
 
-from django.forms.widgets import Media #, MediaDefiningClass
+from django.forms.widgets import Media, MediaDefiningClass
 from django.utils.safestring import mark_safe
 
 from django.utils.html import conditional_escape, html_safe, format_html
@@ -16,16 +16,16 @@ from .items import URL, SubMenu, Separator
 
 #! media
 #! 'active' not enabled
-#? theres a difference between 'hover/link/active/visited' and 'currently selected'.
-#? Do we want 'currently selected' at all? What's web 'active'?
 #! icon_ref
 #! disabled
 #! expanded/disabled on whole menus as option
-#! Separator is a LI item?
+#! Separator is a LI item? But that is excessive and makes styling hard.
+# what does Spec say?
 #! item attrs
 #! attrs shoud be default, if not item overriden?
 #! since template filters only take one parameter, namespacing, or auto-app detection?
-#? expanded Drupal-like theme
+#! Needs attrs?
+#class Menu(MediaDefiningClass):
 class Menu():
     """
     Base class that generates menu list.
@@ -91,7 +91,11 @@ class Menu():
         item_start,
         item_end
     ):
-        "Output HTML. Used by as_table(), as_ul(), as_p()."
+        '''
+        Output HTML.
+        Construct the surrounding HTML framework for items.
+        Used by as_table(), as_ul(), as_p().
+        '''
         #? extra classes: selected, expanded, disabled?, submenu  
         # so triggered by  selected, expanded,
         for e in menu:
