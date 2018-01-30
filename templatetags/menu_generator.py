@@ -3,14 +3,15 @@ from django.conf import settings
 
 from .utils import get_menu_from_apps
 from .. import defaults
-from ..menu import generate_menu
+#from ..menu import generate_menu
 from django.utils.safestring import mark_safe
 
-from ..renderers import MenuRenderer
+#from ..renderers import MenuRenderer
 register = template.Library()
 
 from ..manager import MenuManager
-from ..menu_handler import Menu
+#from ..menu_handler import Menu
+from ..menu import Menu
 
 # [{'url': '/app1-feature', 'submenu': None, 'icon_class': '', 'selected': False, 'name': 'App1 Feature'}, {'url': '/about', 'submenu': None, 'icon_class': '', 'selected': False, 'name': 'About'}]
 
@@ -41,8 +42,8 @@ def get_menu(context, menu_name):
     ##return generate_menu(context['request'], menu_list)
     #visible_menu = generate_menu(context['request'], menu_list)
     #return MenuRenderer(visible_menu).as_ul()
-    a = MenuManager()
-    md = a.get_recursive('filmstat', 'NAV_MENU_TOP')
+    mm = MenuManager()
+    md = mm.get_recursive('filmstat', 'NAV_MENU_TOP')
     m = Menu(context.request, md)
     return str(m)
 

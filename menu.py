@@ -5,148 +5,158 @@ from django.urls import reverse, NoReverseMatch
 
 from .utils import get_callable
 
+from django.conf import settings
 
-class MenuBase(object):
+from django.forms.widgets import Media, MediaDefiningClass
+from django.utils.safestring import mark_safe
+
+from django.utils.html import conditional_escape, html_safe, format_html
+
+from .items import URL, SubMenu, Separator
+from .boundhandler import BoundHandler
+from .handlers import ItemHandler, URLHandler
+from .itemview import SeparatorView, URLView
+
+
+#! media
+#! handle empty menus?
+#! 'active' not enabled
+#! icon_ref
+#! disabled
+#! expanded/disabled on whole menus as option
+#! Separator is a LI item? But that is excessive and makes styling hard.
+# what does Spec say?
+#! item attrs
+#! attrs shoud be default, if not item overriden?
+#! since template filters only take one parameter, namespacing, or auto-app detection?
+#! Needs attrs?
+#class Menu(MediaDefiningClass):
+class Menu():
     """
     Base class that generates menu list.
+    
+    @param attrs to add to menu items
+    @param data [{menu item}, ...]
     """
+    #? maybe for submenus also
+    media = Media(
+        css = {'all':'/django_menus/dropdown.css'}
+    )
+    attrs = {}
 
-    def __init__(self):
-        self.path = ''
-        self.request = None
-
-    def save_user_state(self, request):
-        """
-        Given a request object, store the current user attributes
-        :param request: HttpRequest
-        """
+    def __init__(self, request, menu=None, empty_permitted=False, attrs={}):
         self.request = request
-        self.path = request.path
+        print('..........request:')
+        print(str(request))
+        self.path = ''
+        self.menu = [] if menu is None else menu
+        self.empty_permitted = empty_permitted
+        self.attrs.update(attrs)
 
-    def _is_validated(self, item_dict):
-        """
-        Given a menu item dictionary, it returns true if the user passes all the validator's conditions, it means,
-        if the user passes all the conditions, the user can see the menu
-        """
-        validators = item_dict.get('validators')
-        if not validators:
-            return True
+    #! temp, until we get some definitions going
+    def dispatch(self, menu_item_data):
+        if (isinstance(menu_item_data, Separator)):
+          return BoundHandler(
+            self,
+            ItemHandler(SeparatorView),
+            menu_item_data
+            )
+        elif (isinstance(menu_item_data, SubMenu)): 
+          return BoundHandler(
+            self,
+            URLHandler(URLView),
+            menu_item_data
+            )
+        elif (isinstance(menu_item_data, URL)):
+          return BoundHandler(
+            self,
+            URLHandler(URLView),
+            menu_item_data
+            )
+      
+      
+    #! test 'active'
+    def _html_output_recursive(self, b, menu, 
+        menu_start, 
+        menu_end, 
+        item_start,
+        item_end
+    ):
+        '''
+        Output HTML.
+        Construct the surrounding HTML framework for items.
+        Used by as_table(), as_ul(), as_p().
+        '''
+        #? extra classes: selected, expanded, disabled?, submenu  
+        # so triggered by  selected, expanded,
+        for item in menu:
+            #print('rend:')
+            #print(str(e))
+            html_class_attr = ''
 
-        if not isinstance(validators, (list, tuple)):
-            raise ImproperlyConfigured("validators must be a list")
-
-        result_validations = []
-        for validator in validators:
-            if isinstance(validator, tuple):
-                if len(validator) <= 1:
-                    raise ImproperlyConfigured("You are passing a tuple validator without args %s" % str(validator))
-                func = get_callable(validator[0])
-                # Using a python slice to get all items after the first to build function args
-                args = validator[1:]
-                # Pass the request as first arg by default
-                result_validations.append(func(self.request, *args))
-            else:
-                func = get_callable(validator)
-                result_validations.append(func(self.request))  # pragma: no cover
-        return all(result_validations)
-
-    def _has_attr(self, item_dict, attr):
-        """
-        Given a menu item dictionary, it returns true if an attr is set.
-        """
-        if item_dict.get(attr, False):
-            return True
-        return False
-
-    def _get_icon(self, parent_dict):
-        """
-        Given a menu item dictionary, this returns an icon class if one exist, or
-        returns an empty string.
-        """
-        return parent_dict.get('icon_class', '')
-
-    def _get_url(self, item_dict):
-        """
-        Given a menu item dictionary, it returns the URL or an empty string.
-        """
-        url = item_dict.get('url', '')
-        try:
-            final_url = reverse(**url) if type(url) is dict else reverse(url)
-        except NoReverseMatch:
-            final_url = url
-        return final_url
-
-    def _is_selected(self, item_dict):
-        """
-        Given a menu item dictionary, it returns true if `url` is on path.
-        """
-        url = self._get_url(item_dict)
-        return url == self.path
-
-    def _process_breadcrums(self, menu_list):
-        """
-        Given a menu list, it marks the items on the current path as selected, which
-        can be used as breadcrumbs
-        """
-        for item in menu_list:
-            if item['submenu']:
-                item['selected'] = self._process_breadcrums(item['submenu'])
-            if item['selected']:
-                return True
-        return False
-
-    def _get_submenu_list(self, parent_dict):
-        """
-        Given a menu item dictionary, it returns a submenu if one exist, or
-        returns None.
-        """
-        submenu = parent_dict.get('submenu', None)
-        if submenu:
-            for child_dict in submenu:
-                # This does a join between the menu item validators and submenu item validators and stores it on the
-                # submenu's validators
-                child_dict['validators'] = list(
-                    set(list(parent_dict.get('validators', [])) + list(child_dict.get('validators', [])))
+            bf = self.dispatch(item)
+            css_classes = bf.css_classes()
+            if css_classes:
+                html_class_attr = ' class="%s"' % css_classes
+                            
+            if (isinstance(item, SubMenu)):
+                b.append(item_start.format(attrs=css_classes))
+                b.append(str(bf))
+                b.append(menu_start)
+                self._html_output_recursive(b, item.submenu,
+                    menu_start,
+                    menu_end,
+                    item_start,
+                    item_end
                 )
-            submenu = self.generate_menu(submenu)
-            if not submenu:
-                submenu = None
-        return submenu
+                b.append(menu_end)
+                b.append(item_end)
+            else:
+                b.append(item_start.format(attrs=css_classes))
+                b.append(str(bf))
+                b.append(item_end)
 
-    def _get_menu_list(self, list_dict):
-        """
-        A generator that returns only the visible menu items.
-        """
-        for item in list_dict:
-            if self._has_attr(item, 'name') and self._has_attr(item, 'url'):
-                if self._is_validated(item):
-                    yield copy.copy(item)
+    def _html_output(self, menu_start, menu_end, item_start, item_end):
+        b = []
+        self._html_output_recursive(b, self.menu, 
+        menu_start, 
+        menu_end,
+        item_start,
+        item_end
+        )
+        return mark_safe(''.join(b))
 
-    def generate_menu(self, list_dict):
-        """
-        Given a list of dictionaries, returns a menu list.
-        """
-        visible_menu = []
-        for item in self._get_menu_list(list_dict):
-            item['url'] = self._get_url(item)
-            item['selected'] = self._is_selected(item)
-            item['submenu'] = self._get_submenu_list(item)
-            item['icon_class'] = self._get_icon(item)
-            visible_menu.append(item)
-        self._process_breadcrums(visible_menu)
-        print('visible_menu')
-        print(str(visible_menu))
-        return visible_menu
+    def as_ul(self):
+        "Return this menu rendered as HTML <li>s -- excluding the <ul></ul>."
+        return self._html_output(
+            menu_start = '<ul>',
+            menu_end = '</ul>',
+            item_start = '<li {attrs}>',
+            item_end = '</li>'
+            )
 
+    def as_div(self):
+        "Return this menu rendered as HTML <div>s -- excluding a wrapping <div></div>."
+        return self._html_output(
+            menu_start = '<div class="submenu">',
+            menu_end = '</div>',
+            item_start = '<div {attrs}>',
+            item_end = '</div>'
+            )
+            
+    def __str__(self):
+        return self.as_ul()
 
-class MenuNormalizedList(MenuBase):
-    """
-    Class that generates menu list.
-    """
-
-    def __call__(self, request, list_dict):
-        self.save_user_state(request)
-        return self.generate_menu(list_dict)
-
-
-generate_menu = MenuNormalizedList()
+    def __repr__(self):
+        return '<{}>'.format(
+            self.__class__.__name__,
+            #'valid': is_valid,
+            #'menu': ';'.join(self.fields),
+        )
+    @property
+    def media(self):
+        """Return all media required to render the items on this menu."""
+        media = self.media
+        for e in self.menu:
+            media = media + e.media
+        return media

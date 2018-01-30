@@ -14,6 +14,10 @@ from .manager import(
     MenuManager
 )
 
-from .menu_handler import (
+#from .menu_handler import (
+#    Menu
+#)
+
+from .menu import (
     Menu
 )
