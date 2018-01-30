@@ -1,27 +1,7 @@
-import re
-from django.core.exceptions import ImproperlyConfigured
-from django.forms.widgets import Media
 
-
-from django.utils.safestring import mark_safe
-from django.templatetags.static import static
-from django.utils.html import conditional_escape, html_safe, format_html
-from collections import namedtuple
-
-#! need a distinction beteween data given as options
-#! ans later calculated (e.g. auto expanding)
-#? use auto-attributed kwargs
-#Person = collections.namedtuple('Person', 'name age gender')
-#bob = Person(name='Bob', age=30, gender='male')
+#NB: decided against named tuples because of defaults. Later? R.C.
 class MenuItem:
     str_tmpl = None
-    wrap_css_classes = ''
-    selected = False
-    disabled = False
-
-    def __init__(self, disabled=False):
-        if (disabled):
-            self.disabled = disabled
 
 
 class Separator(MenuItem):
@@ -31,14 +11,15 @@ class Separator(MenuItem):
 class URLMenuItem(MenuItem):
     def __init__(self, name, url, 
         validators=[],
+        disabled=False,
         expanded=False, 
-        disabled=False
         ):
         self.name = name
         self.url = url
         self.validators = validators
+        self.disabled = disabled
         self.expanded = expanded
-        super().__init__(disabled=disabled)
+        super().__init__()
 
 
      
@@ -49,14 +30,20 @@ class SubMenu(URLMenuItem):
     submenu = None
     
     def __init__(self, name, url, menu_ref,
-            icon_ref=None,
-            validators=[], 
-            expanded=False, 
-            disabled=False,
+        icon_ref=None,
+        validators=[], 
+        disabled=False,
+        expanded=False, 
         ):
         self.menu_ref = menu_ref
         self.icon_ref = icon_ref
-        super().__init__(name, url, validators, expanded, disabled)
+        super().__init__(
+            name,
+            url,
+            validators, 
+            disabled,
+            expanded
+        )
 
   
   
@@ -72,8 +59,13 @@ class URL(URLMenuItem):
         disabled=False,
         ):
         self.icon_ref = icon_ref
-        super().__init__(name, url, validators, expanded, disabled)
-        
+        super().__init__(
+            name,
+            url,
+            validators, 
+            disabled,
+            expanded
+        )        
 
 
         
