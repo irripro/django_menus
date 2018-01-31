@@ -4,8 +4,10 @@ class MenuItem:
     str_tmpl = None
 
 
+
 class Separator(MenuItem):
     str_tmpl = '<hr/>'
+
  
      
 class URLMenuItem(MenuItem):
@@ -22,9 +24,7 @@ class URLMenuItem(MenuItem):
         super().__init__()
 
 
-     
-                    
-#! must do all the URL/attr gear of URL
+                         
 class SubMenu(URLMenuItem):
     str_tmpl = '<a href="{url}">{icon}{name}</a>'
     submenu = None

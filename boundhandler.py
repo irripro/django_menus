@@ -20,7 +20,11 @@ class BoundHandler:
         self.menu = menu
         self.handler = handler
         self.item_data = item_data
-
+        # internal. settable properties
+        self.is_disabled = False
+        self.is_hidden = False
+        self.submenu = []
+        
     def __str__(self):
         """Render this handler as an HTML view."""
         return self.as_view()
@@ -64,17 +68,42 @@ class BoundHandler:
             data = self.handler.bound_data(self.data, data)
         return self.handler.prepare_data(data)
 
-    def css_classes(self, extra_classes=None):
+    def css_classes(self, extra_classes=set()):
         """
         Return a string of space-separated CSS classes for this handler.
         """
         #if hasattr(extra_classes, 'split'):
             #extra_classes = extra_classes.split()
-        extra_classes = set(extra_classes or [])
+        if self.is_disabled:
+            extra_classes.add('disabled')
 
         return ' '.join(extra_classes)
 
-    #@cached_property
+    def wrap(self):
+        """Return True if this BoundHandler's view should be wrapped."""
+        return self.handler.view.wrap
+
+    @property
+    def is_disabled(self):
+        """Should BoundHandler's view be disabled."""
+        #! if set, this should set rend too
+        return self.handler.view.is_disabled
+        
+    @is_disabled.setter
+    def is_disabled(self, v):
+        self.handler.view.is_disabled = v
+
+    @property
+    def is_hidden(self):
+        """Should BoundHandler's view be disabled."""
+        #! if set, this should set rend too
+        return self.handler.view.is_hidden
+        
+    @is_hidden.setter
+    def is_hidden(self, v):
+        self.handler.view.is_hidden = v
+                
+      #@cached_property
     #def initial(self):
         #data = self.form.get_initial_for_handler(self.handler, self.name)
         #return data
@@ -86,6 +115,7 @@ class BoundHandler:
         #if view.use_required_attribute(self.initial) and self.handler.required and self.form.use_required_attribute:
         #    attrs['required'] = True
         #if self.handler.disabled:
+        #if True:
         #    attrs['disabled'] = True
         return attrs
 

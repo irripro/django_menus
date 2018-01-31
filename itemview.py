@@ -9,7 +9,7 @@ from django.utils.html import conditional_escape, html_safe, format_html
 
 
 
-def rend_attrs(self, attrs):
+def rend_attrs(attrs):
     b = []         
     for k,v in attrs.items():
         if (v):
@@ -23,9 +23,14 @@ def rend_attrs(self, attrs):
 #? use auto-attributed kwargs
 class ItemView:
     '''
-    Encapsulate the treatment of a menu item.
+    Encapsulate the rendering of a menu item.
     Some similarity to Django form.Widget.
-    The only attreibutes on them are user-definable options.
+    The only attributes on this and subclasses are user-definable options.
+    
+    @param str_tmpl a string formatter for the rendering. Inserted 
+    elements should be named, nt positioned.
+    @param wrap should this menu item be wrapped. Nearly always true, 
+    but not always (e.g. separaters)
     '''
     str_tmpl = None
     '''
@@ -34,6 +39,10 @@ class ItemView:
     '''
     #wrap_css_classes = ''
     
+    wrap = True
+    # internal
+    is_disabled = False
+    is_hidden = False
         
     def __init__(self, attrs=None):
         if attrs is not None:
@@ -55,14 +64,16 @@ class ItemView:
         
     def get_context(self, request, attrs, **kwargs):
         context = kwargs
-        context['widget'] = {
+        context['view'] = {
             #'name': name,
             #'value': self.format_value(value),
+            'disabled' : self.is_disabled,
             'request': request,
             'attrs': self.build_attrs(self.attrs, attrs),
         }
         return context
 
+    #! this should be going into 'widget' key
     def append_css_class(self, context, class_name):
         if ('class' in context and context['class']):
           context['class'] = context['class'] + ' ' + class_name
@@ -76,10 +87,13 @@ class ItemView:
         
     def render(self, request=None, attrs=None, **kwargs):
         """Render the widget as an HTML string."""
-        ctx = self.get_context(request, attrs, **kwargs)
-        #self.extend_css_classes(ctx)
-        self.format_values(ctx)
-        return mark_safe(self.template_render(ctx))
+        if (self.is_hidden):
+            return mark_safe('')
+        else:
+            ctx = self.get_context(request, attrs, **kwargs)
+            #self.extend_css_classes(ctx)
+            self.format_values(ctx)
+            return mark_safe(self.template_render(ctx))
 
     def build_attrs(self, base_attrs, extra_attrs=None):
         """Build an attribute dictionary."""
@@ -95,7 +109,7 @@ class ItemView:
 class URLView(ItemView):
     str_tmpl = '<a href="{url}"{attrs}>{icon}{name}</a>'
     is_expanded = False
-    is_disabled = False
+
     
     def __init__(self,
         attrs = None
@@ -121,10 +135,10 @@ class URLView(ItemView):
 
     #! where are attrs from?
     def template_render(self, context):
+        url = context['url'] if context['disabled'] else '#'
         return self.str_tmpl.format(
-            url = context['url'],
-            #attrs = rend_attrs(context['attrs']),
-            attrs='',
+            url = url,
+            attrs = rend_attrs(context['view']['attrs']),
             icon = self._rend_icon(context['icon_ref']),
             name = context['name']
             )
@@ -141,12 +155,12 @@ class URLView(ItemView):
 
 class SeparatorView(ItemView):
     str_tmpl = '<hr{attrs}/>'
-
+    wrap = False
+    
     #! where are attrs from?
     def template_render(self, context):
         return self.str_tmpl.format(
-            #attrs = rend_attrs(context['attrs']),
-            attrs='',
+            attrs = rend_attrs(context['view']['attrs']),
             )
 
 
