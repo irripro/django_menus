@@ -42,7 +42,6 @@ class ItemView:
     wrap = True
     # internal
     is_disabled = False
-    is_valid = False
         
     def __init__(self, attrs=None):
         if attrs is not None:
@@ -87,13 +86,10 @@ class ItemView:
         
     def render(self, request=None, attrs=None, **kwargs):
         """Render the widget as an HTML string."""
-        if ((not self.is_valid) and (not self.is_disabled)):
-            return mark_safe('')
-        else:
-            ctx = self.get_context(request, attrs, **kwargs)
-            #self.extend_css_classes(ctx)
-            self.format_values(ctx)
-            return mark_safe(self.template_render(ctx))
+        ctx = self.get_context(request, attrs, **kwargs)
+        #self.extend_css_classes(ctx)
+        self.format_values(ctx)
+        return mark_safe(self.template_render(ctx))
 
     def build_attrs(self, base_attrs, extra_attrs=None):
         """Build an attribute dictionary."""
@@ -128,7 +124,7 @@ class URLView(ItemView):
         context = super().get_context(request, attrs, **kwargs)
         if (self.is_expanded):
             self.append_css_class(context, 'expanded')
-        if ((not self.is_valid) and self.is_disabled):
+        if (self.is_disabled):
             self.append_css_class(context, 'disabled')
             context['url'] = '#'
         return context

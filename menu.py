@@ -79,14 +79,15 @@ class Menu():
     media = Media(
         css = {'all':'/django_menus/dropdown.css'}
     )
-    disable_invalid_items = False
+    #disable_invalid_items = False
+    disable_invalid_items = True
     attrs = {}
     
     
     def __init__(self, request, menu=None, disable_invalid=None, attrs={}):
         self.request = request
-        print('..........request:')
-        print(str(request))
+        #print('..........request:')
+        #print(str(request))
         self.path = ''
         # copy to prevent changing the original
         self.menu = [] if menu is None else copy.deepcopy(menu)
@@ -132,18 +133,16 @@ class Menu():
         # so triggered by  selected, expanded,
         # use bound_menu
         for bh in menu:
-            #print('rend:')
-            #print(str(e))
-            if (not bh._is_hidden):
+            print('rend:' + repr(bh))
+            if (bh.is_valid or self.disable_invalid_items):
                 visible_count += 1
-                if hasattr(bh.item_data, 'name'):
-                    #print(str(bh.item_data.name) + ':'+ str(bh.is_valid) + ':' + str(bh.is_disabled))
-                    print(bh.css_classes())
+                #if hasattr(bh.item_data, 'name'):
+                    #print(str(bh.item_data.name) + ':'+ str(bh.is_valid))
+                    #print('menu classes:' + bh.css_classes())
                 html_class_attr = ''
     
                 #bh = self.dispatch(item)
                 #bh.is_valid = False
-                #bh.is_disabled = True
                 css_classes = bh.css_classes()
                 if css_classes:
                     html_class_attr = ' class="%s"' % css_classes
@@ -214,14 +213,14 @@ class Menu():
             media = media + e.media
         return media
 
+    #! noit catching double layer invalid?
     def _validate_recursive(self, menu, bound_menu, menu_is_valid=True):
         for item in menu:
             bh = self.dispatch(item)
             item_is_valid = bh.validate(menu_is_valid)
             #test
-            if (hasattr(item, 'name') and (item.name == 'About')):
+            if (hasattr(item, 'name') and (item.name == 'Reviews')):
                 bh.is_valid = False
-                bh.is_disabled = True
                 item_is_valid = False
             bound_menu.append(bh)
             #if hasattr(item, 'name'):

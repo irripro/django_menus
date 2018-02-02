@@ -16,16 +16,10 @@ __all__ = ('BoundHandler',)
 @html_safe
 class BoundHandler:
     "A Handler with a view instance and data"
-    def __init__(self, handler, item_data, disable_invalid_items=False):
+    def __init__(self, handler, item_data):
         self.handler = handler
         self.item_data = item_data
-        self.disable_invalid_items = disable_invalid_items
-        # internal. settable properties
-        self.is_disabled = False
-        # internal.
-        # set by is_valid using disable_invalid_items
-        self._is_hidden = False
-        self.is_valid = True
+        self._is_valid = True
         self.submenu = []
         
     def __str__(self):
@@ -33,11 +27,11 @@ class BoundHandler:
         return self.as_view()
 
     def __repr__(self):
-        return '<{} item={} valid={}, disabled={}>'.format(
+        return '<{} item={} valid={} wrap={}>'.format(
             self.__class__.__name__,
             self.item_data,
             self.is_valid,
-            self.is_disabled,
+            self.wrap
         )
         
     def __bool__(self):
@@ -86,44 +80,37 @@ class BoundHandler:
         extra_classes=set()
         #if hasattr(extra_classes, 'split'):
             #extra_classes = extra_classes.split()
-        #print( str(not self.is_valid) + ':' + str(self.is_disabled))
+        #print( str(not self.is_valid))
 
-        #print('?:' + str(((not self.is_valid) and (self.is_disabled))) )
-        if ((not self.is_valid) and (self.is_disabled)):
+        #print('?:' + str(not self.is_valid) )
+        if (self.handler.view.is_disabled):
             extra_classes.add('disabled')
         return ' '.join(extra_classes)
 
+    @property
     def wrap(self):
         """Return True if this BoundHandler's view should be wrapped."""
         return self.handler.view.wrap
-        
-    @property
-    def is_disabled(self):
-        """Should BoundHandler's view be disabled."""
-        #! if set, this should set rend too
-        return self.handler.view.is_disabled
-        
-    @is_disabled.setter
-    def is_disabled(self, v):
-        self.handler.view.is_disabled = v
 
     @property
     def is_valid(self):
         """
         Did the BoundHandler pass validity. 
-        Setting the properrty will take action for changing the 
-        view. Depending on disable_invalid_items, the view may
-        be disabled or hidden.
+        Setting the property will take action for changing the 
+        view. Depending on disable_invalid_items (see Menu), the view
+        may be disabled or hidden.
         """
         #! if set, this should set rend too
-        return self.handler.view.is_valid 
+        return self._is_valid 
         
     @is_valid.setter
     def is_valid(self, v):
-        self.handler.view.is_valid = v
-        #        self.disable if (self.disable_invalid_items) 
-        #else 
-        #  self.is
+        # tell the view if it is disabled.
+        # (if item is hidden, the view is not used at all)
+        self.handler.view.is_disabled = (not v)
+        self._is_valid = v
+        
+
                 
       #@cached_property
     #def initial(self):
