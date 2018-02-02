@@ -123,7 +123,7 @@ Menus have no surrounding div, ul, or table tags. These need adding, something l
         
 Modifying
 ---------
-These kinds of apps, this kind of code, has a habit of stating, "You can do anything with our code!" This app is for Django, an MVC framework, so this is true. But there is a limit beyond which you are hacking the app, not configuring. Pehaps the following will help.
+These kinds of apps, this kind of code, has a habit of stating, "You can do anything with our code!" This app is for Django, an MVC framework, so this is true. But there is a limit beyond which you are hacking the app, not configuring. Perhaps the following will help.
 
 
 Menu HTML structure
@@ -173,7 +173,7 @@ The structure is unusual, and has implications for CSS.
 
 First, you will see that the method of placing icons is an image tag. For many years the usual technique was some padding and a background image, or maybe an inserted DIV. The disadvantage of IMG is that you can not use CSS to place content ::before or ::after. So the wonderful Unicode symbols can not be used. The advantage is that the tag is semantic, and can be reliably sized. A fixed width will space the link text into a column; the only work needed is to set a margin (not padding) on all "menu-item-icon" IMGs.
 
-Second, there is no injected HTML/text to help with placing items to the right. This is because CSS still has no good way of handling this layout ('flexbox' has been massively promoted. I find it lacking). But the ancient background-image technique is good (especially as django-menu uses a written block to handle left icons), ::
+Second, there is no injected HTML/text to help with placing items to the right. This is because CSS still has no good way of handling this layout ('flexbox' has been massively promoted. Hummm). But the ancient background-image technique is good (especially as django-menu uses a written block to handle left icons), ::
 
     background-image: url('/static/django_menus/icons/black_small_right_triangle.svg');
     background-position: right center;
@@ -253,7 +253,7 @@ There is an alternative set of mechanics. This produces a push-down menu, ::
           {{ site_menu }}
         </ul>  
         
-The menu looks tidier. More importantly, if you hover elements, you will find the menu operates as you asked. But it looks... basic. The menu may open in wild positions (these classes set no widths).
+The menu looks tidier. More importantly, if you hover elements, you will find the menu operates as you asked. But it looks... basic. The menu may open in wild positions (these classes set no widths/heights/borders etc.).
 
 You can add your own CSS, via Media or directly. Or you can have a look at the sample themes. Themes are in django_menu/static/... Add this to load one, ::
 
@@ -297,7 +297,7 @@ So,
     :alt: menu screenshot
     :align: center
     
-Maybe pushing it, huh, son?
+Maybe pushing it there, huh, bud?
             
             
   

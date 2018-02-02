@@ -37,12 +37,13 @@
     color: #fff;
     text-shadow: none;
 }
-
+    
 .dm-desktop ul {
     /* Sets the width of menu items. Adjust to suit */
     min-width: 8em;
     background-color: #f7f7f7;
     border: 1px solid #969696;
+    top: -2px;
 }
 
 .dm-desktop ul .menu-item-icon {

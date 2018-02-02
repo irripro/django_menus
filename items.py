@@ -13,16 +13,20 @@ class Separator(MenuItem):
 class URLMenuItem(MenuItem):
     def __init__(self, name, url, 
         validators=[],
-        disabled=False,
         expanded=False, 
         ):
         self.name = name
         self.url = url
         self.validators = validators
-        self.disabled = disabled
         self.expanded = expanded
         super().__init__()
 
+    def __repr__(self):
+        return '<{} name={}, url={}>'.format(
+            self.__class__.__name__,
+            self.name,
+            self.url,
+        ) 
 
                          
 class SubMenu(URLMenuItem):
@@ -32,7 +36,6 @@ class SubMenu(URLMenuItem):
     def __init__(self, name, url, menu_ref,
         icon_ref=None,
         validators=[], 
-        disabled=False,
         expanded=False, 
         ):
         self.menu_ref = menu_ref
@@ -41,7 +44,6 @@ class SubMenu(URLMenuItem):
             name,
             url,
             validators, 
-            disabled,
             expanded
         )
 
@@ -63,7 +65,6 @@ class URL(URLMenuItem):
             name,
             url,
             validators, 
-            disabled,
             expanded
         )        
 

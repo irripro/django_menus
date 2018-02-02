@@ -19,10 +19,11 @@ from .boundhandler import BoundHandler
 #! ans later calculated (e.g. auto expanding)
 #? use auto-attributed kwargs
 #? make a queryset version
+#? include validators from items?
 class ItemHandler:
     '''
-    Normalises different kinds of input.
-    Also carries non-rendering logic, such as validation.
+    Prepare and validate items.
+    Can be subclassed to handle data input from specific items. 
     '''
     view = SeparatorView
     validators = []
@@ -47,37 +48,40 @@ class ItemHandler:
         self.validators = list(itertools.chain(self.validators, validators))
         super().__init__()
 
-    def prepare_data(self, data):
-        return data
+    def prepare_item(self, item):
+        '''
+        Prepare input data for validation.
+        If the data is normalised or some other mutaation, then it must 
+        be copied.
+        '''
+        return item
         
-    def run_validators(self, data):
+    def run_validators(self, item):
         validated = True
         for v in self.validators:
-            try:
-                v(data)
-            except ValidationError as e:
-                validated = False
-        return validated
+            #try:
+                v(item)
+            #except ValidationError as e:
+            #    validated = False
+        return item
 
-    def clean(self, data):
-        data = self.prepare_data(data)
-        self.valid = self.run_validators(data)
-        return data
+    def clean(self, item):
+        '''
+        @return clean data
+        @throw validation error
+        '''
+        item = self.prepare_item(item)
+        return self.run_validators(item)
 
+    #-
     def view_attrs(self, view):
         """
         Given a View instance (*not* a View class), return a dictionary of
-        any HTML attributes that should be added to the Widget, based on this
-        Field.
+        any HTML attributes that should be added to the View, based on this
+        Handler.
         """
         return {}
         
-    def get_bound_handler(self, menu, item_data):
-        """
-        Return a BoundHandler instance that will be used when accessing the form
-        field in a template.
-        """
-        return BoundHandler(menu, self, item_data)
 
         
         

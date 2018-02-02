@@ -42,7 +42,7 @@ class ItemView:
     wrap = True
     # internal
     is_disabled = False
-    is_hidden = False
+    is_valid = False
         
     def __init__(self, attrs=None):
         if attrs is not None:
@@ -87,7 +87,7 @@ class ItemView:
         
     def render(self, request=None, attrs=None, **kwargs):
         """Render the widget as an HTML string."""
-        if (self.is_hidden):
+        if ((not self.is_valid) and (not self.is_disabled)):
             return mark_safe('')
         else:
             ctx = self.get_context(request, attrs, **kwargs)
@@ -128,16 +128,16 @@ class URLView(ItemView):
         context = super().get_context(request, attrs, **kwargs)
         if (self.is_expanded):
             self.append_css_class(context, 'expanded')
-        if (self.is_disabled):
+        if ((not self.is_valid) and self.is_disabled):
             self.append_css_class(context, 'disabled')
             context['url'] = '#'
         return context
 
     #! where are attrs from?
     def template_render(self, context):
-        url = context['url'] if context['disabled'] else '#'
+        #url = context['url'] if context['disabled'] else '#'
         return self.str_tmpl.format(
-            url = url,
+            url = context['url'],
             attrs = rend_attrs(context['view']['attrs']),
             icon = self._rend_icon(context['icon_ref']),
             name = context['name']

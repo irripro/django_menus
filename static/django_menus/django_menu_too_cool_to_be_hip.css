@@ -27,6 +27,7 @@
     padding: 15px 0;
     box-shadow: 0 2px 0 0 #c23 inset,0 3px 5px rgba(0,0,0,0.05);
     background-color: #fff;    
+    top: -15px;
 }
 
 .dm-toocool ul li {
@@ -37,7 +38,7 @@
     background: #f3f3f3;
     border-bottom: 2px solid #c23;
 }
-
+     
 .dm-toocool hr {
     margin: 10px 0;
     border-top: 1px solid #bbb;
