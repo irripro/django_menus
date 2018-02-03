@@ -62,22 +62,26 @@ class ItemView:
         pass
         
     def get_context(self, request, attrs, **kwargs):
-        context = kwargs
-        context['view'] = {
+        context = {'view' : kwargs}
+        context['view'].update({
             #'name': name,
             #'value': self.format_value(value),
             'disabled' : self.is_disabled,
             'request': request,
-            'attrs': self.build_attrs(self.attrs, attrs),
-        }
+            'attrs': self.build_attrs(attrs),
+        })
         return context
 
     #! this should be going into 'widget' key
     def append_css_class(self, context, class_name):
-        if ('class' in context and context['class']):
-          context['class'] = context['class'] + ' ' + class_name
+        '''
+        Place extra classes into a view render. 
+        '''
+        ctx_view = context['view']
+        if ('class' in ctx_view and ctx_view['class']):
+            ctx_view['class'] = ctx_view['class'] + ' ' + class_name
         else:
-          context['class'] = class_name
+            ctx_view['class'] = class_name
         return context
 
     def template_render(self, context):
@@ -85,17 +89,19 @@ class ItemView:
         pass
         
     def render(self, request=None, attrs=None, **kwargs):
-        """Render the widget as an HTML string."""
+        """
+        Render the widget as an HTML string.
+        """
         ctx = self.get_context(request, attrs, **kwargs)
         #self.extend_css_classes(ctx)
         self.format_values(ctx)
         return mark_safe(self.template_render(ctx))
 
-    def build_attrs(self, base_attrs, extra_attrs=None):
+    def build_attrs(self, extra_attrs=None):
         """Build an attribute dictionary."""
-        attrs = base_attrs.copy()
+        attrs = self.attrs.copy()
         if extra_attrs is not None:
-            attrs.update(extra_attrs) 
+            attrs.update(extra_attrs)
         return attrs
         
     #something about datadisct....
@@ -132,11 +138,12 @@ class URLView(ItemView):
     #! where are attrs from?
     def template_render(self, context):
         #url = context['url'] if context['disabled'] else '#'
+        ctx_view = context['view']
         return self.str_tmpl.format(
-            url = context['url'],
-            attrs = rend_attrs(context['view']['attrs']),
-            icon = self._rend_icon(context['icon_ref']),
-            name = context['name']
+            url = ctx_view['url'],
+            attrs = rend_attrs(ctx_view['attrs']),
+            icon = self._rend_icon(ctx_view['icon_ref']),
+            name = ctx_view['name']
             )
 
 

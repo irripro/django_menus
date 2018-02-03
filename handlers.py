@@ -73,7 +73,7 @@ class ItemHandler:
         item = self.prepare_item(item)
         return self.run_validators(item)
 
-    #-
+
     def view_attrs(self, view):
         """
         Given a View instance (*not* a View class), return a dictionary of

@@ -20,6 +20,8 @@ class BoundHandler:
         self.handler = handler
         self.item_data = item_data
         self._is_valid = True
+        # used to contruct a tree of BoundHandlers, representing
+        # the original item structure
         self.submenu = []
         
     def __str__(self):
@@ -46,9 +48,7 @@ class BoundHandler:
         """
         if not view:
             view = self.handler.view
-
-        attrs = attrs or {}
-        attrs = self.build_view_attrs(attrs, view)
+        attrs = self.get_view_attrs()
 
         #kwargs = {}
         #if func_supports_parameter(view.render, 'renderer') or func_accepts_kwargs(view.render):
@@ -73,23 +73,20 @@ class BoundHandler:
             data = self.handler.bound_data(self.data, data)
         return self.handler.prepare_data(data)
 
-    def css_classes(self):
+    def get_wrap_css_classes(self):
         """
         Return a string of space-separated CSS classes for the item wrap.
         """
-        extra_classes=set()
-        #if hasattr(extra_classes, 'split'):
-            #extra_classes = extra_classes.split()
-        #print( str(not self.is_valid))
-
-        #print('?:' + str(not self.is_valid) )
+        classes=set()
         if (self.handler.view.is_disabled):
-            extra_classes.add('disabled')
-        return ' '.join(extra_classes)
+            classes.add('disabled')
+        return ' '.join(classes)
 
     @property
     def wrap(self):
-        """Return True if this BoundHandler's view should be wrapped."""
+        """
+        True if this BoundHandler's view should be wrapped.
+        """
         return self.handler.view.wrap
 
     @property
@@ -97,10 +94,9 @@ class BoundHandler:
         """
         Did the BoundHandler pass validity. 
         Setting the property will take action for changing the 
-        view. Depending on disable_invalid_items (see Menu), the view
-        may be disabled or hidden.
+        view. Depending on the attribute 'disable_invalid_items'
+        (see Menu), the view may be disabled or hidden.
         """
-        #! if set, this should set rend too
         return self._is_valid 
         
     @is_valid.setter
@@ -131,15 +127,13 @@ class BoundHandler:
         self.is_valid = (containing_menu_is_valid and validated)
         return validated
         
-    def build_view_attrs(self, attrs, view=None):
-        if not view:
-            view = self.handler.view
-        attrs = dict(attrs)  # Copy attrs to avoid modifying the argument.
-        #if view.use_required_attribute(self.initial) and self.handler.required and self.form.use_required_attribute:
-        #    attrs['required'] = True
-        #if self.handler.disabled:
-        #if True:
-        #    attrs['disabled'] = True
+    def get_view_attrs(self):
+        '''
+        Attribute dict to be used on every item of this type.
+        '''
+        #if not view:
+        #    view = self.handler.view
+        attrs = {}  
         return attrs
 
 

@@ -136,14 +136,10 @@ class Menu():
             print('rend:' + repr(bh))
             if (bh.is_valid or self.disable_invalid_items):
                 visible_count += 1
-                #if hasattr(bh.item_data, 'name'):
-                    #print(str(bh.item_data.name) + ':'+ str(bh.is_valid))
-                    #print('menu classes:' + bh.css_classes())
+                
+                #? unwanted mess
                 html_class_attr = ''
-    
-                #bh = self.dispatch(item)
-                #bh.is_valid = False
-                css_classes = bh.css_classes()
+                css_classes = bh.get_wrap_css_classes()
                 if css_classes:
                     html_class_attr = ' class="%s"' % css_classes
     
@@ -170,10 +166,10 @@ class Menu():
     def _html_output(self, menu_start, menu_end, item_start, item_end):
         b = []
         self._html_output_recursive(b, self.bound_menu, 
-        menu_start,
-        menu_end,
-        item_start,
-        item_end
+            menu_start,
+            menu_end,
+            item_start,
+            item_end
         )
         return mark_safe(''.join(b))
 
@@ -199,9 +195,9 @@ class Menu():
         return self.as_ul()
 
     def __repr__(self):
-        return '<{}>'.format(
+        return '<{} disable_invalid_items={}>'.format(
             self.__class__.__name__,
-            #'valid': is_valid,
+            disable_invalid_items,
             #'menu': ';'.join(self.fields),
         )
         
@@ -219,14 +215,17 @@ class Menu():
             bh = self.dispatch(item)
             item_is_valid = bh.validate(menu_is_valid)
             #test
-            if (hasattr(item, 'name') and (item.name == 'Reviews')):
+            if (hasattr(item, 'name') and (item.name == 'TV')):
                 bh.is_valid = False
                 item_is_valid = False
             bound_menu.append(bh)
             #if hasattr(item, 'name'):
             #    print(str(item.name) + ':'+ str(bh.is_valid))
             if (hasattr(item, 'submenu') and item.submenu):
-                self._validate_recursive(item.submenu, bh.submenu, item_is_valid)
+                    self._validate_recursive(
+                    item.submenu, 
+                    bh.submenu, (item_is_valid and menu_is_valid)
+                )
 
     #like def full_clean(self):
     #! called where? errors < is_valid < [user control]

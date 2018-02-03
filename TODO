@@ -1,11 +1,7 @@
 #! enable querysets
-#! remove LI from HR
-
-wrap is a rendering property,. 
-It goes on the widget, where it is exposed.
-But it must pass back to the menu, for reendering
-
-disabled is an internal property (which may be set from here and there). 
-It seems to go in the handler, as an overall item state (like required). But is hidden, so not config. Maybe BoundHandler?
-It must work late, to accound for vaalidation
-It must pass to the renders
+#! make multiple handlers and metaclass
+#! check template and class activation
+#! renaming
+#! escaping
+#! 'name' to 'title'
+#! implement and test 'expanded'
