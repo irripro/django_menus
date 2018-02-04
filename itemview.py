@@ -72,7 +72,6 @@ class ItemView:
         })
         return context
 
-    #! this should be going into 'widget' key
     def append_css_class(self, context, class_name):
         '''
         Place extra classes into a view render. 
@@ -90,7 +89,7 @@ class ItemView:
         
     def render(self, request=None, attrs=None, **kwargs):
         """
-        Render the widget as an HTML string.
+        Render the view as an HTML string.
         """
         ctx = self.get_context(request, attrs, **kwargs)
         #self.extend_css_classes(ctx)

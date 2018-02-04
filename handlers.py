@@ -38,13 +38,11 @@ class ItemHandler:
         else:
             view = copy.deepcopy(view)
             
-        # Hook into self.widget_attrs() for any Field-specific HTML attributes.
+        # handler-defined attrs.
         extra_attrs = self.view_attrs(view)
         if extra_attrs:
             view.attrs.update(extra_attrs)
-            
         self.view = view or self.view
-
         self.validators = list(itertools.chain(self.validators, validators))
         super().__init__()
 
@@ -73,7 +71,6 @@ class ItemHandler:
         item = self.prepare_item(item)
         return self.run_validators(item)
 
-
     def view_attrs(self, view):
         """
         Given a View instance (*not* a View class), return a dictionary of
@@ -82,7 +79,9 @@ class ItemHandler:
         """
         return {}
         
-
+    def get_wrap_css_classes(self):
+        return set()
+        
         
         
 class URLHandler(ItemHandler):      
@@ -91,10 +90,8 @@ class URLHandler(ItemHandler):
     def __init__(self, 
         view=None,
         validators=(),
-        expanded=False,
         disabled=False
         ):
-        view.is_expanded = expanded
         view.is_disabled = disabled
         super().__init__(view=view, validators=validators)
 
@@ -116,9 +113,23 @@ class URLHandler(ItemHandler):
 
 
 
+class SubmenuHandler(URLHandler):
+    def __init__(self,
+        view=None,
+        validators=(),
+        expanded=False,
+        disabled=False
+        ):
+        self.is_expanded = expanded
+        super().__init__(view=view, validators=validators, disabled=disabled)
 
-#class SubMenuHandler(ItemHandler):                 
-    #pass
+    def get_wrap_css_classes(self):
+        classes = super().get_wrap_css_classes()
+        print('self.is_expanded' + str(self.is_expanded))
+        if (self.is_expanded):
+            classes.add('expanded')
+        return classes
+        
 
 ####
     ##! Get selectors going

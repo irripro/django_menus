@@ -1,7 +1,10 @@
 #! enable querysets
 #! make multiple handlers and metaclass
 #! check template and class activation
-#! renaming
+#! renaming of ...?
 #! escaping
 #! 'name' to 'title'
 #! implement and test 'expanded'
+#! try validator operations
+#! absolute/reverse URL
+#! chains and URL normalsation can be permanetly cached?

@@ -14,7 +14,7 @@ from django.utils.html import conditional_escape, html_safe, format_html
 
 from .items import URL, SubMenu, Separator
 from .boundhandler import BoundHandler
-from .handlers import ItemHandler, URLHandler
+from .handlers import ItemHandler, URLHandler, SubmenuHandler
 from .itemview import SeparatorView, URLView
 
 
@@ -82,6 +82,7 @@ class Menu():
     #disable_invalid_items = False
     disable_invalid_items = True
     attrs = {}
+    url_chains = {}
     
     
     def __init__(self, request, menu=None, disable_invalid=None, attrs={}):
@@ -96,7 +97,14 @@ class Menu():
             self.disable_invalid = disable_invalid
         self.attrs.update(attrs)
         self.validate()
- 
+
+    def chain_set_attribute(self, name, value):
+       chain = self.url_chains.get(self.request.path_info)
+       if (chain):
+           for bh in chain:
+                bh.set_handler_attr(name, value)
+             
+       
     #! temp, until we get some definitions going
     def dispatch(self, menu_item_data):
         if (isinstance(menu_item_data, Separator)):
@@ -106,7 +114,7 @@ class Menu():
             )
         elif (isinstance(menu_item_data, SubMenu)): 
           return BoundHandler(
-            URLHandler(URLView),
+            SubmenuHandler(URLView),
             menu_item_data
             )
         elif (isinstance(menu_item_data, URL)):
@@ -133,15 +141,15 @@ class Menu():
         # so triggered by  selected, expanded,
         # use bound_menu
         for bh in menu:
-            print('rend:' + repr(bh))
             if (bh.is_valid or self.disable_invalid_items):
+                print('rend:' + repr(bh))
                 visible_count += 1
                 
                 #? unwanted mess
                 html_class_attr = ''
                 css_classes = bh.get_wrap_css_classes()
                 if css_classes:
-                    html_class_attr = ' class="%s"' % css_classes
+                    html_class_attr = ' class="%s"' % ' '.join(css_classes)
     
                 if (bh.wrap):
                     b.append(item_start.format(attrs=html_class_attr))
@@ -200,7 +208,16 @@ class Menu():
             disable_invalid_items,
             #'menu': ';'.join(self.fields),
         )
-        
+
+    def chains_to_string(self):
+        b = ['chains:\n']
+        for k, v in self.url_chains.items():
+            b.append('  {}->{}'.format(
+            k,
+            str(v)
+            ))
+        return '\n'.join(b)
+                
     @property
     def media(self):
         """Return all media required to render the items on this menu."""
@@ -209,23 +226,42 @@ class Menu():
             media = media + e.media
         return media
 
-    #! noit catching double layer invalid?
-    def _validate_recursive(self, menu, bound_menu, menu_is_valid=True):
+    def _validate_recursive(self, 
+        menu, 
+        bound_menu,
+        menu_is_valid=True,
+        url_chain=[]
+        ):
         for item in menu:
             bh = self.dispatch(item)
             item_is_valid = bh.validate(menu_is_valid)
             #test
-            if (hasattr(item, 'name') and (item.name == 'TV')):
-                bh.is_valid = False
-                item_is_valid = False
+            #if (hasattr(item, 'name') and (item.name == 'TV')):
+                #bh.is_valid = False
+                #item_is_valid = False
+                #bh.set_handler_attr('is_expanded', True)
             bound_menu.append(bh)
-            #if hasattr(item, 'name'):
-            #    print(str(item.name) + ':'+ str(bh.is_valid))
+            
+            # chains
+            if hasattr(bh.item_data, 'url'):
+                url = bh.item_data.url
+                if (not isinstance(item, SubMenu)):
+                    # NB: this code shallow copies, which is good
+                    chain = list(url_chain)
+                    chain.append(bh)
+                    self.url_chains[url] = chain 
+                    
+            #submenu recurse
             if (hasattr(item, 'submenu') and item.submenu):
-                    self._validate_recursive(
+                #? protect
+                url_chain.append(bh)
+                self._validate_recursive(
                     item.submenu, 
-                    bh.submenu, (item_is_valid and menu_is_valid)
+                    bh.submenu, 
+                    (item_is_valid and menu_is_valid),
+                    url_chain
                 )
+                url_chain.pop()
 
     #like def full_clean(self):
     #! called where? errors < is_valid < [user control]
@@ -237,4 +273,5 @@ class Menu():
         disable.
         """
         self._validate_recursive(self.menu, self.bound_menu) 
-
+        print(self.chains_to_string())
+        self.chain_set_attribute('is_expanded', True)

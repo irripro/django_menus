@@ -77,11 +77,16 @@ class BoundHandler:
         """
         Return a string of space-separated CSS classes for the item wrap.
         """
-        classes=set()
+        classes = self.handler.get_wrap_css_classes()
+        print('classes:')
+        print(str(classes))
         if (self.handler.view.is_disabled):
             classes.add('disabled')
-        return ' '.join(classes)
+        return classes
 
+    def set_handler_attr(self, name, v):
+        setattr(self.handler, name, v)
+    
     @property
     def wrap(self):
         """
@@ -133,10 +138,17 @@ class BoundHandler:
         '''
         #if not view:
         #    view = self.handler.view
-        attrs = {}  
+        attrs = {}
+          
         return attrs
 
+    def get_view_css_classes(self):
+        classes = super().get_view_css_classes()
+        if (self.handler.view.is_expanded):
+            classes.add('disabled')
+        return classes
 
+       
 #@html_safe
 #class BoundWidget:
     #"""
