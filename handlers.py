@@ -90,8 +90,10 @@ class URLHandler(ItemHandler):
     def __init__(self, 
         view=None,
         validators=(),
+        selected=False,
         disabled=False
         ):
+        self.is_selected = selected
         view.is_disabled = disabled
         super().__init__(view=view, validators=validators)
 
@@ -111,23 +113,32 @@ class URLHandler(ItemHandler):
         #data[url] = absolute_path(data[url])
         return data     
 
-
+    def get_wrap_css_classes(self):
+        classes = super().get_wrap_css_classes()
+        if (self.is_selected):
+            classes.add('selected')
+        return classes
+        
+        
 
 class SubmenuHandler(URLHandler):
     def __init__(self,
         view=None,
         validators=(),
+        selected=False,
+        disabled=False,
         expanded=False,
-        disabled=False
         ):
         self.is_expanded = expanded
-        super().__init__(view=view, validators=validators, disabled=disabled)
+        super().__init__(view=view, validators=validators, selected=selected, disabled=disabled)
 
     def get_wrap_css_classes(self):
         classes = super().get_wrap_css_classes()
         print('self.is_expanded' + str(self.is_expanded))
         if (self.is_expanded):
             classes.add('expanded')
+        if (self.is_selected):
+            classes.add('selected')
         return classes
         
 

@@ -13,13 +13,13 @@ def rend_attrs(attrs):
     b = []         
     for k,v in attrs.items():
         if (v):
-            b.append('{0}="{1}"'.format(k, v))
+            b.append(format_html('{0}="{1}"', k, v))
     return ' '.join(b)
 
 
 
 #! need a distinction beteween data given as options
-#! ans later calculated (e.g. auto expanding)
+#! and later calculated (e.g. auto expanding)
 #? use auto-attributed kwargs
 class ItemView:
     '''
@@ -34,11 +34,8 @@ class ItemView:
     '''
     str_tmpl = None
     '''
-    String of CSS classes which should always be added to the wrapper tag
-    of this menu item.
+    Should this item be wrapped (in LI or DIV) by Menu
     '''
-    #wrap_css_classes = ''
-    
     wrap = True
     # internal
     is_disabled = False
@@ -111,26 +108,25 @@ class URLView(ItemView):
     str_tmpl = '<a href="{url}"{attrs}>{icon}{name}</a>'
     is_expanded = False
 
-    
     def __init__(self,
         attrs = None
         ):
         super().__init__()
     
     def _rend_icon(self, icon_ref):
-        icon = '<svg class="menu-item-icon" xmlns="http://www.w3.org/2000/svg" width="0" height="0" viewBox="0 0 0 0" ></svg>'
+        icon = mark_safe('<svg class="menu-item-icon" xmlns="http://www.w3.org/2000/svg" width="0" height="0" viewBox="0 0 0 0" ></svg>')
         if (icon_ref is not None):
-            icon = '<img class="menu-item-icon" src="{}" />'.format(
+            icon = format_html('<img class="menu-item-icon" src="{}" />',
             icon_ref
             )
         return icon
 
     def get_context(self, request, attrs, **kwargs):
         context = super().get_context(request, attrs, **kwargs)
-        if (self.is_expanded):
-            self.append_css_class(context, 'expanded')
+        #if (self.is_expanded):
+        #    self.append_css_class(context, 'expanded')
         if (self.is_disabled):
-            self.append_css_class(context, 'disabled')
+            #self.append_css_class(context, 'disabled')
             context['url'] = '#'
         return context
 
@@ -138,22 +134,12 @@ class URLView(ItemView):
     def template_render(self, context):
         #url = context['url'] if context['disabled'] else '#'
         ctx_view = context['view']
-        return self.str_tmpl.format(
+        return format_html(self.str_tmpl,
             url = ctx_view['url'],
             attrs = rend_attrs(ctx_view['attrs']),
             icon = self._rend_icon(ctx_view['icon_ref']),
             name = ctx_view['name']
             )
-
-
-
-
-#class SubMenuView(URL):
-    #str_tmpl = '<a href="{url}">{icon}{name}</a>'
-    #wrap_css_classes = 'submenu'
-
-
-
 
 class SeparatorView(ItemView):
     str_tmpl = '<hr{attrs}/>'
@@ -161,7 +147,7 @@ class SeparatorView(ItemView):
     
     #! where are attrs from?
     def template_render(self, context):
-        return self.str_tmpl.format(
+        return format_html(self.str_tmpl,
             attrs = rend_attrs(context['view']['attrs']),
             )
 

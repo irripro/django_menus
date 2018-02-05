@@ -2,9 +2,9 @@ Django Menus
 ============
 A menu generator for Django applications.
 
-Uses a hard coded base. As the author of another Django app wrote, "Who wants to use Admin to maintain menus?" (several applications use this approach).
+Uses a hard coded base. As the author of another Django app wrote, "Who wants to use Admin to maintain menus?" (a few other applications use this approach).
 
-
+This is a sophisticated version of a menu builder. It has an API with similarities to django.Form.
 
 Alternatives
 ------------
@@ -105,7 +105,7 @@ There are also some hints taken from the Drupal module NiceMenus_.
 
 Current state
 -------------
-As it arrives. Not working.
+As it arrives. No guarentees.
 
 
 
@@ -121,6 +121,47 @@ Menus have no surrounding div, ul, or table tags. These need adding, something l
       {{ site_menu }}
     </ul>
         
+Quickstart
+----------
+
+...
+
+Data Structure
+--------------
+Menubase has a structure like above. You can find the definitions in the items.py. Use a MenuManager to recover menu data, ::
+
+    MenuManager(self, app, menu_name)
+    
+There's not much more to say about that. The manager is placed in a...
+
+
+Menu
+~~~~~
+Handles overall menu construction. Which means storage, validation, and rendering. Output can be as DIV or LI. Call str() and Menu outputs with the default, LI.
+
+Menu also builds what are called 'URL trails'. Any menu item data which contains a 'url' attribute is checked, and the path noted in a dict of paths. Matching the end point of these trails against requests, Menu can guess if the current page is in the menu. If it is, menu can add classes to display that item in various ways.
+
+This behaviour is not often used in desktop GUIs, but popular in web GUIs. It has advantages, especilly in long menus of content ('you (the user) are currently at page ...').
+
+
+
+Options
++++++++
+disable_invalid
+    If true, and a menu item fails validation, it is not hidden (the 
+    default) but 'greyed out' and anchor menu items are nulled (similar 
+    to a desktop GUI showing non-applicable actions). 
+expand_trail
+    If True, and the current page can be found in the trails (however 
+    deep it is nested), the menu is expanded to show that item.
+select_trail
+    If True, and the current page can be found in the trails (however 
+    deep it is nested), the menu has 'select' styling on the trail items.
+select_leaf
+    If True, and the current page can be found in the trails (however 
+    deep it is nested), the menu has 'select' styling on the target item.
+
+
 Modifying
 ---------
 These kinds of apps, this kind of code, has a habit of stating, "You can do anything with our code!" This app is for Django, an MVC framework, so this is true. But there is a limit beyond which you are hacking the app, not configuring. Perhaps the following will help.
@@ -132,7 +173,7 @@ Menus may render as default (as_list()) as, ::
 
     <ul class="dmenu dmenu-right">
         <li><a href="/articles">Articles</a></li>
-        <li class="submenu"><a href="#">About</a>
+        <li class="submenu selected"><a href="#">About</a>
             <ul><li class="expanded"><a href="/contact">Contact</a></li>
             <li class="submenu"><a href="#">Credits</a><ul>
             <li class="selected"><a href="/credits/now">Now</a></li>
@@ -144,7 +185,7 @@ Menus may render as default (as_list()) as, ::
 
 Some additions to 'class' are hard-coded. These are,
 
-active
+selected
     item marked as part of the current URL
 
 submenu
@@ -169,11 +210,9 @@ Mainly applies to the URL(), though some comments also to SubMenu(), ::
 
 The "icon" class is hard-coded.
 
-The structure is unusual, and has implications for CSS. 
+The structure is unusual, and has implications for CSS. First, you will see that the method of placing icons is an image tag. For many years the usual technique was some padding and a background image, or maybe an inserted DIV. The disadvantage of IMG is that you can not use CSS to place content ::before or ::after. So the wonderful Unicode symbols can not be used. The advantage is that the tag is semantic, and can be reliably sized. A fixed width will space the link text into a column; the only work needed is to set a margin (not padding) on all "menu-item-icon" IMGs.
 
-First, you will see that the method of placing icons is an image tag. For many years the usual technique was some padding and a background image, or maybe an inserted DIV. The disadvantage of IMG is that you can not use CSS to place content ::before or ::after. So the wonderful Unicode symbols can not be used. The advantage is that the tag is semantic, and can be reliably sized. A fixed width will space the link text into a column; the only work needed is to set a margin (not padding) on all "menu-item-icon" IMGs.
-
-Second, there is no injected HTML/text to help with placing items to the right. This is because CSS still has no good way of handling this layout ('flexbox' has been massively promoted. Hummm). But the ancient background-image technique is good (especially as django-menu uses a written block to handle left icons), ::
+Second, there is no injected HTML/text to help with placing items to the right. This is because CSS still has no good way of handling this layout ('flexbox' has been massively promoted. Hummm). But the ancient background-image technique is good (especially as django-menu uses a written block to handle left icons), e.g. ::
 
     background-image: url('/static/django_menus/icons/black_small_right_triangle.svg');
     background-position: right center;
@@ -204,7 +243,10 @@ Styling a CSS menu is advanced. For example, the menu needs space before item te
 
 Anchors often have browser styling, and need direct selection. If you want to customise a submenu mark, it's a background image, and you need a .png at least, which can be difficult to position without 'vertical-align'. If borders are added to items, the alignment will walk up and down, depending on the box-model. 
 
+A theme that enables full support for django_menus will need to respond to 'selected' and 'expanded' classes, and have left/right/down variants.
+
 You may work faster if you copy and modify. If you do not do this as a day job, it can take considerable time.
+
 
 After warning
 +++++++++++++
@@ -297,7 +339,7 @@ So,
     :alt: menu screenshot
     :align: center
     
-Maybe pushing it there, huh, bud?
+Maybe pushing it there, huh, son?
             
             
   

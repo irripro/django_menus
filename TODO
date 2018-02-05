@@ -1,10 +1,14 @@
-#! enable querysets
+#? enable querysets
 #! make multiple handlers and metaclass
 #! check template and class activation
 #! renaming of ...?
 #! escaping
 #! 'name' to 'title'
-#! implement and test 'expanded'
 #! try validator operations
-#! absolute/reverse URL
-#! chains and URL normalsation can be permanetly cached?
+#? absolute/reverse URL
+#? chains and URL normalsation (and handler/views?) can be permanently cached?
+#! More refined chain options.
+#! selected chain option
+#! why no submenu indicators on down menu?
+#? real breadcrumbs
+#! rename 'menus' to 'menubase'
