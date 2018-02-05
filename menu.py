@@ -14,8 +14,8 @@ from django.utils.html import conditional_escape, html_safe, format_html
 
 from .items import URL, SubMenu, Separator
 from .boundhandler import BoundHandler
-from .handlers import ItemHandler, URLHandler, SubmenuHandler
-from .itemview import SeparatorView, URLView
+from .handlers import SeparatorHandler, URLHandler, SubmenuHandler
+#from .itemview import SeparatorView, URLView
 
 
 
@@ -125,22 +125,23 @@ class Menu():
        if (chain):
            bh = chain[-1]
            bh.set_handler_attr(name, value)
-                    
+                
+    #(Submenu, SubmenuHandler)
     #! temp, until we get some definitions going
     def dispatch(self, menu_item_data):
         if (isinstance(menu_item_data, Separator)):
           return BoundHandler(
-            ItemHandler(SeparatorView),
+            SeparatorHandler(),
             menu_item_data
             )
         elif (isinstance(menu_item_data, SubMenu)): 
           return BoundHandler(
-            SubmenuHandler(URLView),
+            SubmenuHandler(),
             menu_item_data
             )
         elif (isinstance(menu_item_data, URL)):
           return BoundHandler(
-            URLHandler(URLView),
+            URLHandler(),
             menu_item_data
             )
       

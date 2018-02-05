@@ -2,7 +2,6 @@
 #! make multiple handlers and metaclass
 #! check template and class activation
 #! renaming of ...?
-#! escaping
 #! 'name' to 'title'
 #! try validator operations
 #? absolute/reverse URL

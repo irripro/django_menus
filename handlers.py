@@ -42,7 +42,7 @@ class ItemHandler:
         extra_attrs = self.view_attrs(view)
         if extra_attrs:
             view.attrs.update(extra_attrs)
-        self.view = view or self.view
+        self.view = view
         self.validators = list(itertools.chain(self.validators, validators))
         super().__init__()
 
@@ -84,19 +84,23 @@ class ItemHandler:
         
         
         
+class SeparatorHandler(ItemHandler):
+    pass
+        
+        
+        
 class URLHandler(ItemHandler):      
     view = URLView
-       
-    def __init__(self, 
-        view=None,
-        validators=(),
-        selected=False,
-        disabled=False
-        ):
-        self.is_selected = selected
-        view.is_disabled = disabled
-        super().__init__(view=view, validators=validators)
 
+    def __init__(self, *,
+        selected=False,
+        disabled=False,
+        **kwargs
+        ):
+        super().__init__(**kwargs)
+        self.is_selected = selected
+        #view.is_disabled = disabled
+        
     #? handy?
     def absolute_path(self, path):
         """
@@ -122,15 +126,12 @@ class URLHandler(ItemHandler):
         
 
 class SubmenuHandler(URLHandler):
-    def __init__(self,
-        view=None,
-        validators=(),
-        selected=False,
-        disabled=False,
+    def __init__(self, *,
         expanded=False,
+        **kwargs
         ):
+        super().__init__(**kwargs)
         self.is_expanded = expanded
-        super().__init__(view=view, validators=validators, selected=selected, disabled=disabled)
 
     def get_wrap_css_classes(self):
         classes = super().get_wrap_css_classes()
