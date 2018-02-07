@@ -4,7 +4,10 @@ A menu generator for Django applications.
 
 Uses a hard coded base. As the author of another Django app wrote, "Who wants to use Admin to maintain menus?" (a few other applications use this approach).
 
+By default, the app renders menu data as CSS-only dropdown menus. With work, the HTML output could be used to render always-expanded menus, Javascript menus (which could use a click action, not a hover action), etc.
+
 This is a sophisticated version of a menu builder. It has an API with similarities to django.Form.
+
 
 Alternatives
 ------------
@@ -100,7 +103,7 @@ Unlike much of my Django code, this app originated in other code, a Django appli
 https://pypi.python.org/pypi/django-menu-generator/1.0.2
 https://github.com/un33k/django-menuware
 
-There are also some hints taken from the Drupal module NiceMenus_.
+Some hints are taken from the Drupal module NiceMenus_.
 
 
 Current state
@@ -120,6 +123,7 @@ Menus have no surrounding div, ul, or table tags. These need adding, something l
     <ul>
       {{ site_menu }}
     </ul>
+        
         
 Quickstart
 ----------

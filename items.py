@@ -1,13 +1,11 @@
 
 #NB: decided against named tuples because of defaults. Later? R.C.
 class MenuItem:
-    str_tmpl = None
-
+    pass
 
 
 class Separator(MenuItem):
-    str_tmpl = '<hr/>'
-
+    pass
  
      
 class URLMenuItem(MenuItem):
@@ -30,7 +28,6 @@ class URLMenuItem(MenuItem):
 
                          
 class SubMenu(URLMenuItem):
-    str_tmpl = '<a href="{url}">{icon}{name}</a>'
     submenu = None
     
     def __init__(self, name, url, menu_ref,
@@ -47,12 +44,17 @@ class SubMenu(URLMenuItem):
             expanded
         )
 
-  
+    def __repr__(self):
+        return '<{} name={}, url={} submenu={}>'.format(
+            self.__class__.__name__,
+            self.name,
+            self.url,
+            self.submenu,
+        )   
   
 #! need to normalise reverses, external urls, etc?
 #? can reverses simply be reverse('news-year-archive', args=(year,))?
 class URL(URLMenuItem):
-    str_tmpl = '<a href="{url}">{icon}{name}</a>'
     
     def __init__(self, name, url,
         icon_ref=None, 

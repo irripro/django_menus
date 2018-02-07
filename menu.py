@@ -79,7 +79,13 @@ class Menu():
     media = Media(
         css = {'all':'/django_menus/dropdown.css'}
     )
-    
+
+    handlers = {
+        SubMenu: SubmenuHandler,
+        Separator: SeparatorHandler,
+        URL: URLHandler
+        }
+        
     #disable_invalid_items = False
     disable_invalid_items = True
     attrs = {}
@@ -126,24 +132,18 @@ class Menu():
            bh = chain[-1]
            bh.set_handler_attr(name, value)
                 
-    #(Submenu, SubmenuHandler)
-    #! temp, until we get some definitions going
+    #from django.utils.module_loading import import_string
+    #item_class = import_string('django_menus.items.SubMenu')
+
+    #? failing here is another argument for preconsruction?
     def dispatch(self, menu_item_data):
-        if (isinstance(menu_item_data, Separator)):
-          return BoundHandler(
-            SeparatorHandler(),
+        handler = self.handlers.get(menu_item_data.__class__)
+        #if (not handler):
+        return BoundHandler(
+            handler(),
             menu_item_data
             )
-        elif (isinstance(menu_item_data, SubMenu)): 
-          return BoundHandler(
-            SubmenuHandler(),
-            menu_item_data
-            )
-        elif (isinstance(menu_item_data, URL)):
-          return BoundHandler(
-            URLHandler(),
-            menu_item_data
-            )
+
       
       
     #! test 'active'

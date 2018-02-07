@@ -40,6 +40,8 @@ class ItemView:
     # internal
     is_disabled = False
         
+    # @param attrs attribute dict to add to the view. The data comes 
+    # from this class; and from the handler, via boundhandler as_view() 
     def __init__(self, attrs=None):
         if attrs is not None:
             self.attrs = attrs.copy()
@@ -59,6 +61,10 @@ class ItemView:
         pass
         
     def get_context(self, request, attrs, **kwargs):
+        '''
+        @param kwargs this the data from a menu item, as transformed by 
+        a handler. It is all passed, as is, to the template context.
+        '''
         context = {'view' : kwargs}
         context['view'].update({
             #'name': name,

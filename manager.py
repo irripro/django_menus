@@ -4,17 +4,15 @@ from django.conf import settings
 
 from .items import SubMenu
 
-MENU_DICT = ".menus.MENUS"
+MENU_DICT = ".menubase.MENUS"
 
 
 #! need an all(), cached
 #? lazy data gathering, to cache
-#! recursion here
 #? API needs multiple query, so not stock map API?
 #? but if recursion ok, stash map...
 #? use attributes, not string keys
 class MenuManager():
-    #{app -> [menu_name -> data]}
     all_app_menus = {}
     
     def __init__(self):
@@ -44,22 +42,21 @@ class MenuManager():
             except AttributeError:
                 app_menus = None
             if app_menus:
-                 self.all_app_menus[app] = app_menus       
-    
-    #? this can embed an empty list?
-    def get_recursive(self, app, menu_name):
-        menu = self.get(app, menu_name)
-        if (menu):
-            for idx, e in enumerate(menu):
-                 if (isinstance(e, SubMenu)):
-                     submenu = self.get_recursive(app, e.menu_ref)
-                     #! delete if fails?
-                     menu[idx].submenu = submenu
+                 self.all_app_menus[app] = app_menus
+
+    def load_menu(self, app, menu_name):
+        return self.all_app_menus[app][menu_name]
+
+    def _call_recursive(self, app, menu_name):
+        menu = self.load_menu(app, menu_name)
+        for idx, e in enumerate(menu):
+             if (isinstance(e, SubMenu)):
+                 submenu = self._call_recursive(app, e.menu_ref)
+                 menu[idx].submenu = submenu
         return menu
         
-        
     def __call__(self, app, menu_name):
-        return self.all_app_menus[app][menu_name] 
+        return self._call_recursive(app, menu_name)
         
     def get(self, app, menu_name):
         """
@@ -67,19 +64,23 @@ class MenuManager():
         
         @return if fails, return empty list
         """
-        if (app in self.all_app_menus and menu_name in self.all_app_menus[app]):
-            return self.all_app_menus[app][menu_name]        
-        return []
+        r = None
+        try:
+            r = self(app, menu_name)
+        except KeyError:
+            pass        
+        return r
         
     def get_menus(self, app, menu_names):
         """
         Get data from several menus.
         
+        @param menu_names iterable of menu names
         @return if fails, return empty list
         """
         if (not app in self.all_app_menus):
-            return []
-        return {mn:self.all_app_menus[app][mn] for mn in self.all_app_menus[app].keys() if (mn in menu_names)}
+            return None
+        return {mn:get(app, mn) for mn in menu_names}
             
     def __str__(self):
         return '<{}>'.format(
@@ -97,4 +98,3 @@ class MenuManager():
             self.__class__.__name__,
             menus,
         )
-

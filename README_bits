@@ -23,4 +23,36 @@ trees in general
 Also, there is a computational question about implementation. According to the discussion about relative databases, a 'category' is not part of a Model (it is 'the truth', it is 'the whole truth', but it is not 'and nothing but the truth'). So a Model category should be kept in a seperate table. But there is a case to keep categories as part of a Model. In practice, a category will be closely bound, may well be specific, to one model only. Keeping category data on the model itself keeps table data compacted and relevant (one downside would be if query joins became complex, which is one of the prime reasons for normalising. Another would be clarity for database maintenence. But if binding to one type of object is assured, both these use cases become less of a hinderance).
 
 ----
+# form
+-- value
+> boundfield
+initial or from widget via self.data dict(), then prepare
+__str__ renders widget
+> widget in render, format, put in context
+
+-- errors
+form: control, render
+boundfield: picks them up, checks against form, adds them to css_classes (irreversible)
+-- required
+boundfield: rescues these in the label and css_classes, checking the field
+--disabled
+field: on field as attribute
+boundfield: check field, set in wiget_attrs
+--hidden
+boundfield: written
+--attrs
+boundfield: check if field is required or disabled, then add (irreverable)
+
+# menu
+If it needs to be permanent information that a user can set, like 'required' , put it on the handler. In truth, nothing we have is like this. No---attributes, classes 'expand'. Build these in.
+
+So handler needs a writable css_classes? #? Which checks expand - No
+Expand can be forced on by menu?
+Select forced by menu, how?
+Disable forced by menu, how? from where?
+Maybe pass selected chain to boundhandler? or request to handler?
+
+
+
+
 

@@ -99,6 +99,7 @@ class URLHandler(ItemHandler):
         ):
         super().__init__(**kwargs)
         self.is_selected = selected
+        self.is_disabled = selected
         #view.is_disabled = disabled
         
     #? handy?
