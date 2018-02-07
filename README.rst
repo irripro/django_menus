@@ -127,6 +127,45 @@ Menus have no surrounding div, ul, or table tags. These need adding, something l
         
 Quickstart
 ----------
+Build a menu in an app. Put it in a file 'menubase.py'. The menu is a dict containing classes, and the dict name must be 'MENUS'. Here's an example menu config which shows a few features, ::
+    
+    from django_menus import SubMenu, URL, Separator
+    
+    MENUS = {
+        'NAV_MENU_TOP_DEPARTMENTS': [
+            URL("Classics", "/classics/"),
+            URL("Sociology", "/sociology/"),
+            URL("Fine Art", "/fineart/"),
+        ]
+        'NAV_MENU_TOP_WORK_WITH_US': [
+            URL("Help", "/help/"),
+            URL("By department", "/department/conferences/"),
+            URL("Conferences", "/conferences/"),
+            Separator(),
+            URL("Contact", "/contact/"),
+        ],    
+        'NAV_MENU_TOP_RESOURCES': [
+            URL("Map", "/map/"),
+            URL("Plant", "/plant"),
+            URL("Research", "/research"),
+            URL("Events", "/conferences/"),
+            URL("Projects", "/projects/"),
+        ], 
+        'NAV_MENU_TOP_ABOUT': [
+            URL("Dates", "/dates/"),
+            URL("Annual Report", "/report/annual/"),
+            URL("Jobs", "/jobs/"),
+        ],
+        'NAV_MENU_TOP': [
+            URL("Home", "/home/"),
+            SubMenu("Departments", "#", 'NAV_MENU_TOP_DEPARTMENTS'),
+            SubMenu("Work with us", "#", 'NAV_MENU_TOP_WORK_WITH_US'),
+            SubMenu("Resources", "#", 'NAV_MENU_TOP_RESOURCES'),
+            SubMenu("About", "#", 'NAV_MENU_TOP_ABOUT'),
+            URL("Search", "/search/"),
+        ]
+    }
+  
 
 ...
 
@@ -349,7 +388,9 @@ Maybe pushing it there, huh, son?
   
 Fun things you can do
 ~~~~~~~~~~~~~~~~~~~~~
-Translucent menu :) (why, why do I even suggest this?)
+- Translucent menu
+- Get some CSS animation going
+(why, why do I even suggest this?)
 
 
 .. _NiceMenus: https://www.drupal.org/project/nice_menus

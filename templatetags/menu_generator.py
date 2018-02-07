@@ -43,7 +43,7 @@ def get_menu(context, menu_name):
     #visible_menu = generate_menu(context['request'], menu_list)
     #return MenuRenderer(visible_menu).as_ul()
     mm = MenuManager()
-    md = mm.get_recursive('filmstat', 'NAV_MENU_TOP')
+    md = mm('filmstat', 'NAV_MENU_TOP')
     m = Menu(context.request, md, expand_trail=True, select_leaf=True)
     return str(m)
 
