@@ -40,7 +40,7 @@ class BoundHandler:
         # BoundHandler evaluates to True.
         return True
 
-    def as_view(self, view=None, attrs=None):
+    def as_view(self, view=None, attrs={}):
         """
         Render the handler by rendering the passed view, adding any HTML
         attributes passed as attrs. If a view isn't specified, use the
@@ -48,8 +48,12 @@ class BoundHandler:
         """
         if not view:
             view = self.handler.view
-        attrs = self.get_view_attrs()
-
+            
+        # add handler view-attrs and views attr. Both the below will
+        # copy info over, protecting originals
+        attrs.update(self.handler.get_view_attrs(view))
+        attrs.update(view.attrs)
+        
         #kwargs = {}
         #if func_supports_parameter(view.render, 'renderer') or func_accepts_kwargs(view.render):
         #    kwargs['renderer'] = self.form.renderer

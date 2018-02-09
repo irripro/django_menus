@@ -11,7 +11,9 @@ from django.forms.widgets import Media, MediaDefiningClass
 from django.utils.safestring import mark_safe
 
 from django.utils.html import conditional_escape, html_safe, format_html
+from django.core.urlresolvers import resolve
 
+from .manager import MenuManager 
 from .items import URL, SubMenu, Separator
 from .boundhandler import BoundHandler
 from .handlers import SeparatorHandler, URLHandler, SubmenuHandler
@@ -90,8 +92,17 @@ class Menu():
     disable_invalid_items = True
     attrs = {}
     
+    # Two classwide caches
+    # {app_name->{menu_name->[bound_items]}
+    bound_menu_cache = {}
+    # {app_name->{menu_name->{url->[chain of bound items]}}
+    url_chain_cache = {}
+    url_chains = {}
+        
     def __init__(self, request, 
-        menu=None,
+        #menu=None,
+        menu_name,
+        app=None,
         disable_invalid=None,
         expand_trail=False,
         select_trail=False,     
@@ -101,10 +112,15 @@ class Menu():
         self.request = request
         #print('..........request:')
         #print(str(request))
-        self.path = ''
+        if (not app):
+            app = resolve(request.path).app_name
+            if (not app):
+                raise ImproperlyConfigured('Not given an app name, and none available from request.') 
+
+        #self.path = ''
         # copy to prevent changing the original
-        self.menu = [] if menu is None else copy.deepcopy(menu)
-        self.bound_menu = []
+        #self.menu = [] if menu is None else copy.deepcopy(menu)
+        
         if disable_invalid is not None:
             self.disable_invalid = disable_invalid
         self.expand_trail = expand_trail
@@ -116,7 +132,8 @@ class Menu():
         self.url_chains = {}
         
         # build initial data
-        self.validate()
+        self.bound_menu = self.get_bound_menu(app, menu_name)
+        self.validate(self.bound_menu)
 
     def trail_set_handler_attribute(self, name, value):
        #? better matches
@@ -144,8 +161,6 @@ class Menu():
             menu_item_data
             )
 
-      
-      
     #! test 'active'
     def _html_output_recursive(self, b, menu, 
         menu_start, 
@@ -195,7 +210,9 @@ class Menu():
             
     def _html_output(self, menu_start, menu_end, item_start, item_end):
         b = []
-        self._html_output_recursive(b, self.bound_menu, 
+        self._html_output_recursive(
+            b, 
+            self.bound_menu, 
             menu_start,
             menu_end,
             item_start,
@@ -249,19 +266,61 @@ class Menu():
         return media
 
     def _validate_recursive(self, 
-        menu, 
         bound_menu,
         menu_is_valid=True,
-        url_chain=[]
+        #url_chain=[]
         ):
-        for item in menu:
-            bh = self.dispatch(item)
+        for bh in bound_menu:
+            #bh = self.dispatch(item)
             item_is_valid = bh.validate(menu_is_valid)
             #test
             #if (hasattr(item, 'name') and (item.name == 'TV')):
                 #bh.is_valid = False
                 #item_is_valid = False
                 #bh.set_handler_attr('is_expanded', True)
+            #bound_menu.append(bh)
+                    
+            #submenu recurse
+            #if (hasattr(item, 'submenu') and item.submenu):
+            if (isinstance(bh, SubMenu)):
+                #? protect
+                #url_chain.append(bh)
+                self._validate_recursive(
+                    bh.submenu, 
+                    (item_is_valid and menu_is_valid),
+                    #url_chain
+                )
+                #url_chain.pop()
+
+    #like def full_clean(self):
+    #! called where? errors < is_valid < [user control]
+    def validate(self, bound_menu):
+        """
+        Run validations.
+        Also generates boundfields.
+        Also build menu wide data such as marking descendant hide or 
+        disable.
+        """
+        #self._validate_recursive(self.bound_menu) 
+        self._validate_recursive(bound_menu) 
+        print(self.chains_to_string())
+        #! request on attribute
+        if (self.select_trail):
+            self.trail_set_handler_attribute('is_selected', True)
+        if (self.select_leaf):
+            self.trail_leaf_set_handler_attribute('is_selected', True)
+        if (self.expand_trail):
+            self.trail_set_handler_attribute('is_expanded', True)
+
+
+    def _bind_recursive(self, 
+        menu, 
+        bound_menu,
+        url_chains,
+        url_chain=[]
+        ):
+        for item in menu:
+            bh = self.dispatch(item)
             bound_menu.append(bh)
             
             # chains
@@ -277,29 +336,46 @@ class Menu():
             if (hasattr(item, 'submenu') and item.submenu):
                 #? protect
                 url_chain.append(bh)
-                self._validate_recursive(
+                self._bind_recursive(
                     item.submenu, 
-                    bh.submenu, 
-                    (item_is_valid and menu_is_valid),
+                    bh.submenu,
+                    url_chains, 
                     url_chain
                 )
                 url_chain.pop()
 
-    #like def full_clean(self):
-    #! called where? errors < is_valid < [user control]
-    def validate(self):
-        """
-        Run validations.
-        Also generates boundfields.
-        Also build menu wide data such as marking descendant hide or 
-        disable.
-        """
-        self._validate_recursive(self.menu, self.bound_menu) 
-        print(self.chains_to_string())
-        #! request on attribute
-        if (self.select_trail):
-            self.trail_set_handler_attribute('is_selected', True)
-        if (self.select_leaf):
-            self.trail_leaf_set_handler_attribute('is_selected', True)
-        if (self.expand_trail):
-            self.trail_set_handler_attribute('is_expanded', True)
+    # query items will be hald-resolved, so here (probably) or in the
+    # boot tests? 
+    # Wherever that is, chains are built there.
+    def cache_bound_menu(self, app, menu_name):
+        if (not (app in self.bound_menu_cache)):
+            self.bound_menu_cache[app] = {}            
+            self.url_chain_cache[app] = {}            
+        if (not (menu_name in self.bound_menu_cache[app])):
+            mm = MenuManager()
+            menu = mm.get(app, menu_name)
+            if (not menu):
+                raise ImproperlyConfigured('Unable to find menu configuration. app_name:{}: menu_name:{}'.format(app, menu_name)) 
+            bound_menu = []
+            url_chains = {}
+            self._bind_recursive(menu, bound_menu, url_chains) 
+            self.bound_menu_cache[app][menu_name] = bound_menu
+            self.url_chain_cache[app][menu_name] = url_chains
+
+    def get_bound_menu(self, app, menu_name):
+        r = None
+        try:
+            r = self.bound_menu_cache[app][menu_name]
+        except KeyError:
+            self.cache_bound_menu(app, menu_name)
+            r = self.bound_menu_cache[app][menu_name]
+        return r
+        
+    #? extend for chain, not chains
+    def get_chain(self, app, menu_name):
+        if (
+        (app not in self.bound_menu_cache)
+        and (menu_name not in self.bound_menu_cache[app])
+        ):
+            self.cache_bound_menu(app, menu_name)
+        return self.url_chain_cache[app][menu_name]

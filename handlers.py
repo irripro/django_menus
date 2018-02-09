@@ -13,17 +13,17 @@ from .itemview import ItemView, SeparatorView, URLView
 from .boundhandler import BoundHandler
 
 
-
-
-#! need a distinction beteween data given as options
-#! ans later calculated (e.g. auto expanding)
-#? use auto-attributed kwargs
 #? make a queryset version
 #? include validators from items?
 class ItemHandler:
     '''
-    Prepare and validate items.
-    Can be subclassed to handle data input from specific items. 
+    Configuration and validation of item data.
+    For eachtype of menu item, there is a handler. The handler contains
+    configuration which is overall for the item. The configuration can 
+    be set by the user.
+    Handlers are built per menu, then cached across web calls. Any data
+    inside should be regarded as as immutable, and the methods 
+    as idempotent. 
     '''
     view = SeparatorView
     validators = []
@@ -39,9 +39,11 @@ class ItemHandler:
             view = copy.deepcopy(view)
             
         # handler-defined attrs.
-        extra_attrs = self.view_attrs(view)
-        if extra_attrs:
-            view.attrs.update(extra_attrs)
+        #? Not sure about this. Let boundhandler, which also has 
+        # view_attrs, do the job? It's not a big deal, is it?
+        #extra_attrs = self.get_view_attrs(view)
+        #if extra_attrs:
+            #view.attrs.update(extra_attrs)
         self.view = view
         self.validators = list(itertools.chain(self.validators, validators))
         super().__init__()
@@ -71,7 +73,7 @@ class ItemHandler:
         item = self.prepare_item(item)
         return self.run_validators(item)
 
-    def view_attrs(self, view):
+    def get_view_attrs(self, view):
         """
         Given a View instance (*not* a View class), return a dictionary of
         any HTML attributes that should be added to the View, based on this
@@ -82,6 +84,7 @@ class ItemHandler:
     def get_wrap_css_classes(self):
         return set()
         
+    #def
         
         
 class SeparatorHandler(ItemHandler):
@@ -91,16 +94,6 @@ class SeparatorHandler(ItemHandler):
         
 class URLHandler(ItemHandler):      
     view = URLView
-
-    def __init__(self, *,
-        selected=False,
-        disabled=False,
-        **kwargs
-        ):
-        super().__init__(**kwargs)
-        self.is_selected = selected
-        self.is_disabled = selected
-        #view.is_disabled = disabled
         
     #? handy?
     def absolute_path(self, path):
@@ -116,13 +109,7 @@ class URLHandler(ItemHandler):
     # What may need to be altered here?
     def prepare_data(self, data):
         #data[url] = absolute_path(data[url])
-        return data     
-
-    def get_wrap_css_classes(self):
-        classes = super().get_wrap_css_classes()
-        if (self.is_selected):
-            classes.add('selected')
-        return classes
+        return data
         
         
 
@@ -137,10 +124,9 @@ class SubmenuHandler(URLHandler):
     def get_wrap_css_classes(self):
         classes = super().get_wrap_css_classes()
         print('self.is_expanded' + str(self.is_expanded))
+        classes.add('submenu')
         if (self.is_expanded):
             classes.add('expanded')
-        if (self.is_selected):
-            classes.add('selected')
         return classes
         
 

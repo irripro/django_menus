@@ -71,7 +71,8 @@ class ItemView:
             #'value': self.format_value(value),
             'disabled' : self.is_disabled,
             'request': request,
-            'attrs': self.build_attrs(attrs),
+            #'attrs': self.build_attrs(attrs),
+            'attrs': attrs,
         })
         return context
 
@@ -99,12 +100,13 @@ class ItemView:
         self.format_values(ctx)
         return mark_safe(self.template_render(ctx))
 
-    def build_attrs(self, extra_attrs=None):
-        """Build an attribute dictionary."""
-        attrs = self.attrs.copy()
-        if extra_attrs is not None:
-            attrs.update(extra_attrs)
-        return attrs
+    #- skip this, do it in boundfield
+    #def build_attrs(self, extra_attrs=None):
+        #"""Build an attribute dictionary."""
+        #attrs = self.attrs.copy()
+        #if extra_attrs is not None:
+            #attrs.update(extra_attrs)
+        #return attrs
         
     #something about datadisct....
         

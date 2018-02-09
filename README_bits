@@ -34,12 +34,12 @@ __str__ renders widget
 form: control, render
 boundfield: picks them up, checks against form, adds them to css_classes (irreversible)
 -- required
-boundfield: rescues these in the label and css_classes, checking the field
+boundfield: rescues these from ...? in the label and css_classes, checking the field
 --disabled
 field: on field as attribute
 boundfield: check field, set in wiget_attrs
 --hidden
-boundfield: written
+boundfield: written to ...?
 --attrs
 boundfield: check if field is required or disabled, then add (irreverable)
 
@@ -52,7 +52,39 @@ Select forced by menu, how?
 Disable forced by menu, how? from where?
 Maybe pass selected chain to boundhandler? or request to handler?
 
+Can do initial checks, like 
+- circular dependency
+- URL resolution
+(can't do full resolution, because QeryItem is dynamic)
 
+Can not do cached binding, because views carry data?
+Why can boundfields be cached, when value and required are changing?
+
+Form gets varying data in. Data is effectively duplicated as
+validated (is_valid->errors, html_output->errors add_error->errors, 
+has_error->errors etc.)
+
+Required and hidden *as variable* is a possibility on every field. So 
+are handled by Form.
+
+is_required makes it's way to widgets (needed on every one) via. 
+Field->required init(). Because it is permanent. is_required as required
+is passed to the context. Nothing is passed to the context which is not 
+in a field,
+
+Note that widgets are particular to a Field, even if replacable.
+
+Menu gets data too. But needs to add data, like 
+selected/expanded/disabled (disabled is not the same as Form disabled,
+Form disabled is permanent for visual info, Menu disabled is temporary 
+for notification of current limitation). Is this data added as a boost 
+to the item data, or as css classes only? I think it should be data,
+for widget designers.
+
+Forced expand is not the same as auto expand. How this overrides is ...?
+
+So we have data that is not preset field data, or init data, but needs 
+to reach the widget either as classes or context data. Unlike Form.
 
 
 

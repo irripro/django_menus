@@ -127,7 +127,7 @@ Menus have no surrounding div, ul, or table tags. These need adding, something l
         
 Quickstart
 ----------
-Build a menu in an app. Put it in a file 'menubase.py'. The menu is a dict containing classes, and the dict name must be 'MENUS'. Here's an example menu config which shows a few features, ::
+Build a menu  configuration in an app. Put it in a file 'menubase.py'. The menu is a dict containing classes, and the dict name must be 'MENUS'. Here's an example, ::
     
     from django_menus import SubMenu, URL, Separator
     

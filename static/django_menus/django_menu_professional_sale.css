@@ -1,0 +1,76 @@
+
+/*
+ * Push-down style.
+ * Probabvly respond well to fixed width and positioning.
+ */ 
+.dm-prsale {
+    font-family: "Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
+    font-size: 16px;
+    line-height: 24px;
+    word-wrap: break-word;
+    text-align: left;
+    text-transform: uppercase;
+    list-style: none;
+    background: #aa8f6f;
+    padding: 0;
+    display:inline-block;
+}
+
+.dm-prsale a {
+    color: #fff;
+    text-decoration: none;
+    padding: 12.5px;
+    display:block;
+}
+
+.dm-prsale a:hover {
+}
+
+.dm-prsale li {
+    border-bottom: 1px solid #aa8663;
+}
+
+.dm-prsale li.submenu {
+}
+.dm-prsale li.expanded {
+}
+
+.dm-prsale .selected > a {
+    color: #000;
+}
+
+.dm-prsale ul {
+    list-style: none;
+    background: #aa8663;
+    border-top: 1px solid #9a744f;
+    margin: 0;
+    display: block;
+}
+
+
+
+/*
+.dm-prsale li:hover > ul {
+    transition-property: all;
+    transition-duration: 1s;
+    transition-timing-function: ease;
+    opacity: 1;
+        height: 100%;
+    overflow: visible;
+}
+*/
+
+.dm-prsale ul li {
+    border-bottom: 1px solid #9a744f;
+}
+
+.dm-prsale .submenu:hover {
+}
+
+.dm-prsale hr {
+    border-top: 1px dotted #ccc;
+    border-bottom: 1px solid #9a744f;
+    margin: 2px auto 2px 0;
+}
+
+
