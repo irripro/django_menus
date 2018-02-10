@@ -38,11 +38,12 @@ class ItemView:
     '''
     wrap = True
     # internal
-    is_disabled = False
+    #is_disabled = False
         
     # @param attrs attribute dict to add to the view. The data comes 
     # from this class; and from the handler, via boundhandler as_view() 
     def __init__(self, attrs=None):
+        #? no need to copy now boundhander does the job
         if attrs is not None:
             self.attrs = attrs.copy()
         else:
@@ -69,7 +70,7 @@ class ItemView:
         context['view'].update({
             #'name': name,
             #'value': self.format_value(value),
-            'disabled' : self.is_disabled,
+            #'disabled' : self.is_disabled,
             'request': request,
             #'attrs': self.build_attrs(attrs),
             'attrs': attrs,
@@ -98,6 +99,7 @@ class ItemView:
         ctx = self.get_context(request, attrs, **kwargs)
         #self.extend_css_classes(ctx)
         self.format_values(ctx)
+        #print('ctx:' + str(ctx))
         return mark_safe(self.template_render(ctx))
 
     #- skip this, do it in boundfield
@@ -113,7 +115,12 @@ class ItemView:
 
         
 class URLView(ItemView):
-    str_tmpl = '<a href="{url}"{attrs}>{icon}{name}</a>'
+    # NB: URL is regarded as an attr so it can be eliminated entirely.
+    # In the rest of the item processing chain, it is a separate item.
+    # It is only concaternated right at the end, in the string 
+    # template format.
+    #str_tmpl = '<a href="{url}"{attrs}>{icon}{name}</a>'
+    str_tmpl = '<a {attrs}>{icon}{name}</a>'
     is_expanded = False
 
     def __init__(self,
@@ -131,19 +138,24 @@ class URLView(ItemView):
 
     def get_context(self, request, attrs, **kwargs):
         context = super().get_context(request, attrs, **kwargs)
+        # do we want to expand here?
+        
+        ctx = context['view']
         #if (self.is_expanded):
         #    self.append_css_class(context, 'expanded')
-        if (self.is_disabled):
+        if (ctx['disabled']):
             #self.append_css_class(context, 'disabled')
-            context['url'] = '#'
+            ctx['url'] = ''
         return context
 
     #! where are attrs from?
     def template_render(self, context):
         #url = context['url'] if context['disabled'] else '#'
         ctx_view = context['view']
+        if (ctx_view['url']):
+            ctx_view['attrs']['href'] = ctx_view['url']
         return format_html(self.str_tmpl,
-            url = ctx_view['url'],
+            #url = ctx_view['url'],
             attrs = rend_attrs(ctx_view['attrs']),
             icon = self._rend_icon(ctx_view['icon_ref']),
             name = ctx_view['name']

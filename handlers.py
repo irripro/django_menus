@@ -21,8 +21,8 @@ class ItemHandler:
     For eachtype of menu item, there is a handler. The handler contains
     configuration which is overall for the item. The configuration can 
     be set by the user.
-    Handlers are built per menu, then cached across web calls. Any data
-    inside should be regarded as as immutable, and the methods 
+    Handlers are constructed per menu, then cached across web calls. Any
+    attributes should be regarded as as immutable, and the methods 
     as idempotent. 
     '''
     view = SeparatorView
@@ -63,7 +63,6 @@ class ItemHandler:
                 v(item)
             #except ValidationError as e:
             #    validated = False
-        return item
 
     def clean(self, item):
         '''
@@ -71,7 +70,7 @@ class ItemHandler:
         @throw validation error
         '''
         item = self.prepare_item(item)
-        return self.run_validators(item)
+        self.run_validators(item)
 
     def get_view_attrs(self, view):
         """
@@ -81,10 +80,27 @@ class ItemHandler:
         """
         return {}
         
-    def get_wrap_css_classes(self):
+    def get_wrap_css_classes(self, finished_data):
         return set()
         
-    #def
+    def get_extension_data(self, valid,  bound_handler, trail=[]):
+        '''
+        Add data to extend the config data.
+        When this data is requested, the configuration data is validated 
+        and transformed into an initial_context.
+        
+        Unlike the handler data, which is cached and
+        immutable, the extended data can be modified by other code in 
+        Boundhandler, Menu, etc. The values in the dict act as a 
+        default. However, this method recieves some useful data,
+        including the bound handler which called it. This data may be 
+        enough to make useful settings to extended data.
+        
+        @return  dict of data to update the initial context.
+        '''
+        return {}
+        
+        
         
         
 class SeparatorHandler(ItemHandler):
@@ -111,7 +127,24 @@ class URLHandler(ItemHandler):
         #data[url] = absolute_path(data[url])
         return data
         
-        
+    def get_extension_data(self, valid, bound_handler, trail=[]):
+        d = super(). get_extension_data(valid, trail)
+        d.update({
+        'selected': (bound_handler in trail),
+        'disabled':  (not valid),
+        })
+        return d
+
+    def get_wrap_css_classes(self, finished_data):
+        classes = super().get_wrap_css_classes(finished_data)
+        #print('self.is_expanded' + str(self.is_expanded))
+        if (finished_data['selected']):
+            classes.add('selected')
+        if (finished_data['disabled']):
+            classes.add('disabled')
+        return classes        
+
+
 
 class SubmenuHandler(URLHandler):
     def __init__(self, *,
@@ -121,14 +154,20 @@ class SubmenuHandler(URLHandler):
         super().__init__(**kwargs)
         self.is_expanded = expanded
 
-    def get_wrap_css_classes(self):
-        classes = super().get_wrap_css_classes()
-        print('self.is_expanded' + str(self.is_expanded))
+    def get_extension_data(self, valid,  bound_handler, trail=[]):
+        d = super().get_extension_data(valid, trail)
+        d.update({
+        'expanded' : self.is_expanded or (bound_handler in trail),
+        })        
+        return d
+
+    def get_wrap_css_classes(self, finished_data):
+        classes = super().get_wrap_css_classes(finished_data)
+        #print('self.is_expanded' + str(self.is_expanded))
         classes.add('submenu')
-        if (self.is_expanded):
+        if (self.is_expanded or finished_data['expanded']):
             classes.add('expanded')
         return classes
-        
 
 ####
     ##! Get selectors going

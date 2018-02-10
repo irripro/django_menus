@@ -1,7 +1,8 @@
 
 /*
  * Push-down style.
- * Probabvly respond well to fixed width and positioning.
+ * Use JS. Not good with CSS hover action.
+ * Needs fixed or full width (and positioning?).
  */ 
 .dm-prsale {
     font-family: "Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
@@ -21,18 +22,11 @@
     text-decoration: none;
     padding: 12.5px;
     display:block;
-}
-
-.dm-prsale a:hover {
+    outline: 0;
 }
 
 .dm-prsale li {
-    border-bottom: 1px solid #aa8663;
-}
-
-.dm-prsale li.submenu {
-}
-.dm-prsale li.expanded {
+    border-top: 1px solid #aa8663;
 }
 
 .dm-prsale .selected > a {
@@ -42,35 +36,28 @@
 .dm-prsale ul {
     list-style: none;
     background: #aa8663;
-    border-top: 1px solid #9a744f;
     margin: 0;
+}
+
+.dm-prsale .expanded > ul {
     display: block;
 }
 
-
-
-/*
-.dm-prsale li:hover > ul {
-    transition-property: all;
-    transition-duration: 1s;
-    transition-timing-function: ease;
-    opacity: 1;
-        height: 100%;
-    overflow: visible;
-}
-*/
-
 .dm-prsale ul li {
-    border-bottom: 1px solid #9a744f;
+    border-top: 1px solid #9a744f;
 }
 
-.dm-prsale .submenu:hover {
+.dm-prsale .submenu > a {
+   background: url('/static/django_menus/icons/white_cross.svg') center right 15px no-repeat;
+}
+
+.dm-prsale .expanded > a {
+  background: url('/static/django_menus/icons/white_side_cross.svg') center right 15px no-repeat;
 }
 
 .dm-prsale hr {
-    border-top: 1px dotted #ccc;
-    border-bottom: 1px solid #9a744f;
-    margin: 2px auto 2px 0;
+    border-bottom: 1px solid #999;
+    border-top: 1px solid #9a744f;
 }
 
 

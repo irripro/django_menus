@@ -278,13 +278,17 @@ Modify structure of HTML
 
 
 
-Default CSS, and overriding
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Default CSS, themes, and overriding
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Django menu comes with a CSS/JS action and theme set builtin.
+
+I suppose I could claim how fabulous this is, which it can be. However, I've not worked it through. It can give strange and marvelous results. But give it a go because, if it gets you part-way down the road, that's a start, right?
+ 
 WARNING
 +++++++
-Styling a CSS menu is advanced. For example, the menu needs space before item text. But most menus do not need spacing before top-level horizontal items (no icons there, usually). You can, to add space, set a width on the embedded icon IMG. To avoid the top level, you can select the horizontal menu, and kill spacing, or select only submenus to space, or go down a level e.g. .dm-desktop ul .menu-item-icon {width: 14px; margin: 0 2px;}.
+The app includes little CSS files. They may be small, but they are advanced. Styling a CSS menu is not simple. For example, the menu needs space before item text. But most menus do not need spacing before top-level horizontal items (no icons there, usually). You can, to add space, set a width on the embedded icon IMG. To avoid the top level, you can select the horizontal menu, and kill spacing, or select only submenus to space, or go down a level e.g. .dm-desktop ul .menu-item-icon {width: 14px; margin: 0 2px;}.
 
-Anchors often have browser styling, and need direct selection. If you want to customise a submenu mark, it's a background image, and you need a .png at least, which can be difficult to position without 'vertical-align'. If borders are added to items, the alignment will walk up and down, depending on the box-model. 
+Anchors often have browser styling, and need direct selection. If you want to customize a submenu mark, it's a background image, and you need a .png at least, which can be difficult to position without 'vertical-align'. If borders are added to items, the alignment will walk up and down, depending on the box-model. 
 
 A theme that enables full support for django_menus will need to respond to 'selected' and 'expanded' classes, and have left/right/down variants.
 
@@ -295,7 +299,7 @@ After warning
 +++++++++++++
 The menu tags, or a context injection, deliver a pre-rendered menu HTML. This, in a browser, looks promising (if you are a glass-half-full person) but is not finished product.
 
-django_menus comes with a CSS structure built-in. This is delivered by default through Media statements (as used by Django Forms). Which means you can keep as much as you want, or override.
+django_menus comes with a CSS/JS structure, and some themes, built-in. You can ignore all of this and roll your own. The CSS/JS can be hardcoded into templates, or delivered by Media statements (as used by Django Forms). You can keep as much as you want, or override.
 
 Let's stay with the builtin system.
 
@@ -321,24 +325,24 @@ If you have a look, the menu output is raw, but promising. Now import the CSS as
         {% load menu_generator %}
 
         {% get_menu "SITE_MENU" as site_menu %}
-        <ul class="dmenu dmenu-right dmenu-horizontal">
+        <ul class="dmenu dmenu-css dmenu-right dmenu-horizontal">
           {{ site_menu }}
         </ul>        
         
 Any depth in the menu will disappear (which is correct, don't panic).
 
-'dmenu' sets all the basic hide/show/hover action. 'dmenu-right' opens to the right ('dmenu-left' to the left). 'dmenu-horizontal' sets the first entries in the menu horizontal (or do not put this in, and have a vertical menu).
+'dmenu' sets some known basics (e.g. "submenus do not initially show"). 'dmenu-css' sets CSS show-on-hover action. 'dmenu-right' opens submenus to the right ('dmenu-left' to the left). 'dmenu-horizontal' sets the first entries in the menu horizontal (or do not put this in, and have a vertical menu).
 
-There is an alternative set of mechanics. This produces a push-down menu, ::
+You can mix these CSS modules (though they can give wierd results). No directions gives a push-down menu stack, ::
 
         {% load menu_generator %}
 
         {% get_menu "SITE_MENU" as site_menu %}
-        <ul class="dmenu-down">
+        <ul class="dmenu dmenu-css">
           {{ site_menu }}
         </ul>  
         
-The menu looks tidier. More importantly, if you hover elements, you will find the menu operates as you asked. But it looks... basic. The menu may open in wild positions (these classes set no widths/heights/borders etc.).
+Anyway, the menu looks tidier. More importantly, if you hover elements, you will find the menu operates as you asked. But it looks... basic. The menu may open in wild positions (these classes set no widths/heights/borders etc.).
 
 You can add your own CSS, via Media or directly. Or you can have a look at the sample themes. Themes are in django_menu/static/... Add this to load one, ::
 
@@ -349,7 +353,7 @@ Then add the class inside the file to the wrapping UL tags, ::
         {% load menu_generator %}
 
         {% get_menu "SITE_MENU" as site_menu %}
-        <ul class="dmenu dmenu-right dmenu-horizontal dm-desktop">
+        <ul class="dmenu dmenu-css dmenu-right dmenu-horizontal dm-desktop">
           {{ site_menu }}
         </ul> 
         
@@ -371,7 +375,7 @@ Ok, let's try a push-down theme, ::
     {% load menu_generator %}
 
     {% get_menu "SITE_MENU" as site_menu %}
-    <ul class="dmenu-down dm-machinery">
+    <ul class="dmenu dmenu-css dm-machinery">
       {{ site_menu }}
     </ul> 
 
@@ -383,8 +387,29 @@ So,
     :align: center
     
 Maybe pushing it there, huh, son?
-            
-            
+
+
+There is also a Javascript solution (which uses the JQuery from Django admin). Javascript action offers a fundamentally different experience, as the menu will not work on hover, but on clicking. This may or may not be a preference. Click actions also influence design (hover themes will not work well for click themes, and visa-versa). Before you ask, yes, I know CSS can do click menus, and that JS can do hover menus. I decided against both paths. If you, the reader, want to prove something, go ahead.
+
+
+We need to put the Javascript into the template (or our menu will be unwantedly static). Here is everything you need, plus a theme, for the template head (or Media). So; JQuery, Django JQuery init, the menu JS code, the CSS base and theme, ::
+
+
+    <script type="text/javascript" src={% static 'admin/js/vendor/jquery/jquery.min.js' %}></script>
+    <script type="text/javascript" src={% static 'admin/js/jquery.init.js' %}></script>
+    <script src={% static 'django_menus/js/django_menu.js' %}></script>
+    <link href={% static 'django_menus/django_menu_base.css' %} type="text/css" media="all" rel="stylesheet">
+    <link href={% static 'django_menus/django_menu_professional_sale.css' %} type="text/css" media="all" rel="stylesheet">            
+  
+Phew. Now, easy, as this is a vertical pushdown menu (the default), ::
+
+        <ul class="dmenu dmenu-js dm-prsale">
+
+PS: a pushdown stacking menu seems to be commonly agreed as one of the best solutions for a responsive design.
+
+I built this, and I'm sure it could make many people happy. It's not my idea of good, though. So you get no picture.
+
+  
   
 Fun things you can do
 ~~~~~~~~~~~~~~~~~~~~~

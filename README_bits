@@ -86,5 +86,6 @@ Forced expand is not the same as auto expand. How this overrides is ...?
 So we have data that is not preset field data, or init data, but needs 
 to reach the widget either as classes or context data. Unlike Form.
 
-
+Decision: validation does not produce new values (Form does this I hope 
+because it needs to convert to Python). 
 

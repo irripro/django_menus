@@ -18,14 +18,45 @@
  CSS for subsequent menu styling
 ********************************/
 .dmenu {
+    white-space: nowrap;
     box-sizing: border-box;
     margin: 0;
 }
 
 .dmenu li {
-    white-space: nowrap;
+    display: block;
+}
+
+.dmenu ul {
+    display: none;
+    margin:0;
+}
+
+.dmenu .expanded > ul {
+    display: block;
+}
+
+.dmenu-right li, .dmenu-left li {
     position: relative;
 }
+
+.dmenu-right ul, .dmenu-left ul {
+    display: none;
+    position: absolute;
+    top:0;
+    margin: 0;
+    width:100%;
+    z-index: 4;
+}
+
+.dmenu-left ul {
+    right: 100%;
+}
+
+.dmenu-right ul {
+    left: 100%;
+}
+
 
 .dmenu-horizontal > li {
     display: inline-block;
@@ -38,48 +69,11 @@
     right: 0;
 }
 
-.dmenu ul {
-    display: none;
-    position: absolute;
-    margin: 0;
-    width:100%;
-    z-index: 4;
-}
-
-.dmenu-left ul {
-    top:0;
-    right: 100%;
-}
-
-.dmenu-right ul {
-    top:0;
-    left: 100%;
-}
-
-
-
-.dmenu li:hover > ul, .dmenu .expanded > ul {
+.dmenu-css li:hover > ul {
     display: block;
 }
 
-.dmenu ul li {
-    display: block;
-}
-
-/* Push-down styles (different namespace) */
-.dmenu-down {
-    box-sizing: border-box;
-    margin: 0;
-}
-
-.dmenu-down li {
-    white-space: word-wrap;
-}
-
-.dmenu-down ul {
-    display: none;
-}
-
-.dmenu-down li:hover > ul, .dmenu-down .expanded > ul {
-    display: block;
+/*  JS styles (don't do much) */
+.dmenu-js {
+  outline: 0;
 }

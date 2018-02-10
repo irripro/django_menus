@@ -13,26 +13,30 @@ __all__ = ('BoundHandler',)
 
 #? menu parameter useless?
 #? may take attributes? or classes?
-@html_safe
+#@html_safe
 class BoundHandler:
-    "A Handler with a view instance and data"
+    '''
+    Bind a handler with a view instance and accept data.
+    One is constructed for every menu item. Cached across web calls.
+    '''
     def __init__(self, handler, item_data):
         self.handler = handler
         self.item_data = item_data
-        self._is_valid = True
+        #? This is mutable and should not be here?
+        #self._is_valid = True
         # used to contruct a tree of BoundHandlers, representing
         # the original item structure
         self.submenu = []
         
-    def __str__(self):
+    #def __str__(self):
         """Render this handler as an HTML view."""
-        return self.as_view()
+        #return self.as_view()
 
     def __repr__(self):
-        return '<{} item={} valid={} wrap={}>'.format(
+        return '<{} item={} wrap={}>'.format(
             self.__class__.__name__,
             self.item_data,
-            self.is_valid,
+            #self.is_valid,
             self.wrap
         )
         
@@ -40,7 +44,17 @@ class BoundHandler:
         # BoundHandler evaluates to True.
         return True
 
-    def as_view(self, view=None, attrs={}):
+    def get_extended_data(self, valid, trail):
+       '''
+       Extend the config data with handler-configured extension data.
+       
+       @return a dict version of the data. 
+       '''
+       d = self.handler.get_extension_data(valid, self, trail)
+       d.update(self.item_data.__dict__)
+       return d
+       
+    def as_view(self, item_context, view=None, attrs={}):
         """
         Render the handler by rendering the passed view, adding any HTML
         attributes passed as attrs. If a view isn't specified, use the
@@ -49,16 +63,17 @@ class BoundHandler:
         if not view:
             view = self.handler.view
             
-        # add handler view-attrs and views attr. Both the below will
-        # copy info over, protecting originals
+        # add handler view-attrs and views attr. The below will
+        # copy info over, protecting the originals
+        #? could be cached? Or init?
+        attrs = attrs.copy()
         attrs.update(self.handler.get_view_attrs(view))
         attrs.update(view.attrs)
-        
+
         #kwargs = {}
         #if func_supports_parameter(view.render, 'renderer') or func_accepts_kwargs(view.render):
         #    kwargs['renderer'] = self.form.renderer
-
-        return view.render(request=None, attrs=attrs, **self.item_data.__dict__)
+        return view.render(request=None, attrs=attrs, **item_context)
 
    #@property
     #def data(self):
@@ -67,29 +82,29 @@ class BoundHandler:
         """
         #return self.handler.view.value_from_datadict(self.form.data, self.form.files, self.html_name)
 
-    def values(self):
-        """
-        Return the value for this BoundField, using the initial value if
-        the form is not bound or the data otherwise.
-        """
-        data = self.initial
-        if self.menu.is_bound:
-            data = self.handler.bound_data(self.data, data)
-        return self.handler.prepare_data(data)
+    #def values(self):
+        #"""
+        #Return the value for this BoundField, using the initial value if
+        #the form is not bound or the data otherwise.
+        #"""
+        #data = self.initial
+        #if self.menu.is_bound:
+            #data = self.handler.bound_data(self.data, data)
+        #return self.handler.prepare_data(data)
 
-    def get_wrap_css_classes(self):
+    def get_wrap_css_classes(self, finished_data):
         """
         Return a string of space-separated CSS classes for the item wrap.
         """
-        classes = self.handler.get_wrap_css_classes()
-        print('classes:')
-        print(str(classes))
-        if (self.handler.view.is_disabled):
-            classes.add('disabled')
+        classes = self.handler.get_wrap_css_classes(finished_data)
+        #print('classes:')
+        #print(str(classes))
+        #if (self.handler.view.is_disabled):
+        #    classes.add('disabled')
         return classes
 
-    def set_handler_attr(self, name, v):
-        setattr(self.handler, name, v)
+    #def set_handler_attr(self, name, v):
+    #    setattr(self.handler, name, v)
     
     @property
     def wrap(self):
@@ -98,22 +113,22 @@ class BoundHandler:
         """
         return self.handler.view.wrap
 
-    @property
-    def is_valid(self):
-        """
-        Did the BoundHandler pass validity. 
-        Setting the property will take action for changing the 
-        view. Depending on the attribute 'disable_invalid_items'
-        (see Menu), the view may be disabled or hidden.
-        """
-        return self._is_valid 
+    #@property
+    #def is_valid(self):
+        #"""
+        #Did the BoundHandler pass validity. 
+        #Setting the property will take action for changing the 
+        #view. Depending on the attribute 'disable_invalid_items'
+        #(see Menu), the view may be disabled or hidden.
+        #"""
+        #return self._is_valid 
         
-    @is_valid.setter
-    def is_valid(self, v):
-        # tell the view if it is disabled.
-        # (if item is hidden, the view is not used at all)
-        self.handler.view.is_disabled = (not v)
-        self._is_valid = v
+    #@is_valid.setter
+    #def is_valid(self, v):
+        ## tell the view if it is disabled.
+        ## (if item is hidden, the view is not used at all)
+        #self.handler.view.is_disabled = (not v)
+        #self._is_valid = v
         
 
                 
@@ -122,19 +137,19 @@ class BoundHandler:
         #data = self.form.get_initial_for_handler(self.handler, self.name)
         #return data
 
-    def validate(self, containing_menu_is_valid):
+    def validate(self, request, containing_menu_is_valid):
         '''
         Prepares the item data, validates, and informs the view of the 
         result.
         @return if processing is ok or not
         '''
-        validated = True
+        validated = containing_menu_is_valid
         try:
-            self.item_data = self.handler.clean(self.item_data)
+            self.handler.clean(self.item_data)
         except ValidationError as e:
             validated = False
-        self.is_valid = (containing_menu_is_valid and validated)
         return validated
+
         
     def get_view_attrs(self):
         '''

@@ -97,12 +97,12 @@ class Menu():
     bound_menu_cache = {}
     # {app_name->{menu_name->{url->[chain of bound items]}}
     url_chain_cache = {}
-    url_chains = {}
+    #url_chains = {}
         
     def __init__(self, request, 
         #menu=None,
         menu_name,
-        app=None,
+        app_name=None,
         disable_invalid=None,
         expand_trail=False,
         select_trail=False,     
@@ -112,11 +112,13 @@ class Menu():
         self.request = request
         #print('..........request:')
         #print(str(request))
-        if (not app):
-            app = resolve(request.path).app_name
-            if (not app):
+        if (not app_name):
+            app_name = resolve(request.path).app_name
+            if (not app_name):
                 raise ImproperlyConfigured('Not given an app name, and none available from request.') 
-
+        self.app_name = app_name
+        self.menu_name = menu_name
+        
         #self.path = ''
         # copy to prevent changing the original
         #self.menu = [] if menu is None else copy.deepcopy(menu)
@@ -129,26 +131,40 @@ class Menu():
         self.attrs.update(attrs)
 
         # internal
-        self.url_chains = {}
+        #self.url_chains = {}
         
         # build initial data
-        self.bound_menu = self.get_bound_menu(app, menu_name)
-        self.validate(self.bound_menu)
+        self.bound_menu = self.get_bound_menu(app_name, menu_name)
+        #self.validate(self.bound_menu)
 
-    def trail_set_handler_attribute(self, name, value):
-       #? better matches
-       chain = self.url_chains.get(self.request.path_info)
-       if (chain):
-           for bh in chain:
-                bh.set_handler_attr(name, value)
+    #def trail_set_handler_attribute(self, name, value):
+       ##? better matches
+       #chain = self.url_chains.get(self.request.path_info)
+       #if (chain):
+           #for bh in chain:
+                #bh.set_handler_attr(name, value)
              
-    def trail_leaf_set_handler_attribute(self, name, value):
-       #? better matches
-       chain = self.url_chains.get(self.request.path_info)
-       if (chain):
-           bh = chain[-1]
-           bh.set_handler_attr(name, value)
-                
+    #def trail_leaf_set_handler_attribute(self, name, value):
+       ##? better matches
+       #chain = self.url_chains.get(self.request.path_info)
+       #if (chain):
+           #bh = chain[-1]
+           #bh.set_handler_attr(name, value)
+
+    def get_trail(self):
+        #? better matches
+        trail = []
+        if (self.select_trail or self.select_leaf):
+            trails = self.get_trails()
+            #print('trails:' + str(trails))    
+            trail = trails.get(self.request.path_info)
+            #trail = self.url_chain_cache[self.app].get(self.request.path_info)
+            #trail = self.url_chains.get(self.request.path_info)
+        if (self.select_leaf):
+            trail = trail[-1:]
+        return trail
+
+                                       
     #from django.utils.module_loading import import_string
     #item_class = import_string('django_menus.items.SubMenu')
 
@@ -166,7 +182,8 @@ class Menu():
         menu_start, 
         menu_end, 
         item_start,
-        item_end
+        item_end,
+        menu_is_valid=True,
     ):
         '''
         Output HTML.
@@ -176,21 +193,38 @@ class Menu():
         visible_count = 0
         #? extra classes: selected, expanded, disabled?, submenu  
         # so triggered by  selected, expanded,
-        # use bound_menu
+        # validate
+        # if printing
+        #   extend(chain, valid)
+        #   set any extensions
+        #       select, if matches
+        #       expand, if matches
+        #       disable, if invalid
+        #   output
+        trail = self.get_trail()
+        print('trail:' + str(trail))
+
         for bh in menu:
-            if (bh.is_valid or self.disable_invalid_items):
-                print('rend:' + repr(bh))
+            valid = bh.validate(self.request, menu_is_valid)
+            if (valid or self.disable_invalid_items):
+                # ok, print
+                
+                #print('rend:' + repr(bh))
+                #! can be boolean
                 visible_count += 1
                 
+                # extend the data first (this sets some dynamic 
+                # configuration)
+                ctx = bh.get_extended_data(valid, trail)
+
                 #? unwanted mess
                 html_class_attr = ''
-                css_classes = bh.get_wrap_css_classes()
+                css_classes = bh.get_wrap_css_classes(ctx)
                 if css_classes:
                     html_class_attr = ' class="%s"' % ' '.join(css_classes)
-    
                 if (bh.wrap):
                     b.append(item_start.format(attrs=html_class_attr))
-                b.append(str(bh))
+                b.append(bh.as_view(ctx))
                 #if (isinstance(item, SubMenu)):
                 if (hasattr(bh, 'submenu') and bh.submenu):
                     bsub = []
@@ -249,12 +283,19 @@ class Menu():
         )
 
     def chains_to_string(self):
-        b = ['chains:\n']
-        for k, v in self.url_chains.items():
-            b.append('  {}->{}'.format(
-            k,
-            str(v)
-            ))
+        b = ['chains:']
+        #for k, v in self.url_chains.items():
+            #b.append('  {}->{}'.format(
+            #k,
+            #str(v)
+            #))
+        for app in self.url_chain_cache:
+            for k, v in self.url_chain_cache[app].items():
+                b.append('  {}.{}->{}'.format(
+                app,
+                k,
+                str(v)
+                ))
         return '\n'.join(b)
                 
     @property
@@ -305,12 +346,12 @@ class Menu():
         self._validate_recursive(bound_menu) 
         print(self.chains_to_string())
         #! request on attribute
-        if (self.select_trail):
-            self.trail_set_handler_attribute('is_selected', True)
-        if (self.select_leaf):
-            self.trail_leaf_set_handler_attribute('is_selected', True)
-        if (self.expand_trail):
-            self.trail_set_handler_attribute('is_expanded', True)
+        #if (self.select_trail):
+            #self.trail_set_handler_attribute('is_selected', True)
+        #if (self.select_leaf):
+            #self.trail_leaf_set_handler_attribute('is_selected', True)
+        #if (self.expand_trail):
+            #self.trail_set_handler_attribute('is_expanded', True)
 
 
     def _bind_recursive(self, 
@@ -330,7 +371,7 @@ class Menu():
                     # NB: this code shallow copies, which is good
                     chain = list(url_chain)
                     chain.append(bh)
-                    self.url_chains[url] = chain 
+                    url_chains[url] = chain 
                     
             #submenu recurse
             if (hasattr(item, 'submenu') and item.submenu):
@@ -371,11 +412,13 @@ class Menu():
             r = self.bound_menu_cache[app][menu_name]
         return r
         
-    #? extend for chain, not chains
-    def get_chain(self, app, menu_name):
+    #? not properly defended
+    def get_trails(self):
+        app = self.app_name
+        menu_name = self.menu_name
         if (
-        (app not in self.bound_menu_cache)
-        and (menu_name not in self.bound_menu_cache[app])
+            (app not in self.bound_menu_cache)
+            and (menu_name not in self.bound_menu_cache[app])
         ):
             self.cache_bound_menu(app, menu_name)
         return self.url_chain_cache[app][menu_name]
