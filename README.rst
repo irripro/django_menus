@@ -7,7 +7,7 @@ Uses a hard coded base. As the author of another Django app wrote, "Who wants to
 By default, the app renders menu data as CSS-only hover-action dropdown menus. There are also files/support for creating one-click JavaScript menus. The HTML output is data with no action enabled, so can be used to enable whatever style and action of menu you want.
 
 When to use
-~~~~~~~~~~~
+------------
 This is a sophisticated version of a menu builder. It has an API with similarities to django.Form. Why use a powerful (probably hungry?) app like this? For a simple menu you should not. In Django you can nake a menu in a template by writing in the links, then move or change the menu with a simple rewrite.
 
 The time to use this app is when you want long-term maintainability. To be able to come back after a year and know how to make substancial changes in minutes. Or when you have a deep menu system and your templates are becoming cluttered and hard to read.
