@@ -13,8 +13,9 @@ def rend_attrs(attrs):
     b = []         
     for k,v in attrs.items():
         if (v):
+            #? What gets strings, what not?
             b.append(format_html('{0}="{1}"', k, v))
-    return ' '.join(b)
+    return mark_safe(' '.join(b))
 
 
 
@@ -119,7 +120,6 @@ class URLView(ItemView):
     # In the rest of the item processing chain, it is a separate item.
     # It is only concaternated right at the end, in the string 
     # template format.
-    #str_tmpl = '<a href="{url}"{attrs}>{icon}{name}</a>'
     str_tmpl = '<a {attrs}>{icon}{name}</a>'
     is_expanded = False
 
@@ -141,25 +141,23 @@ class URLView(ItemView):
         # do we want to expand here?
         
         ctx = context['view']
-        #if (self.is_expanded):
-        #    self.append_css_class(context, 'expanded')
+        # if disabled, remove href
         if (ctx['disabled']):
-            #self.append_css_class(context, 'disabled')
             ctx['url'] = ''
         return context
 
     #! where are attrs from?
     def template_render(self, context):
-        #url = context['url'] if context['disabled'] else '#'
         ctx_view = context['view']
         if (ctx_view['url']):
             ctx_view['attrs']['href'] = ctx_view['url']
         return format_html(self.str_tmpl,
-            #url = ctx_view['url'],
             attrs = rend_attrs(ctx_view['attrs']),
             icon = self._rend_icon(ctx_view['icon_ref']),
             name = ctx_view['name']
             )
+
+
 
 class SeparatorView(ItemView):
     str_tmpl = '<hr{attrs}/>'

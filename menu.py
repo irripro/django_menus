@@ -157,10 +157,13 @@ class Menu():
         if (self.select_trail or self.select_leaf):
             trails = self.get_trails()
             #print('trails:' + str(trails))    
-            trail = trails.get(self.request.path_info)
+            print('self.request.path_info:' + str(self.request.path_info))    
+            t = trails.get(self.request.path_info)
+            if (t):
+                trail = t
             #trail = self.url_chain_cache[self.app].get(self.request.path_info)
             #trail = self.url_chains.get(self.request.path_info)
-        if (self.select_leaf):
+        if (self.select_leaf and trail):
             trail = trail[-1:]
         return trail
 
@@ -215,7 +218,7 @@ class Menu():
                 
                 # extend the data first (this sets some dynamic 
                 # configuration)
-                ctx = bh.get_extended_data(valid, trail)
+                ctx = bh.get_initial_context(valid, trail)
 
                 #? unwanted mess
                 html_class_attr = ''

@@ -1,0 +1,15 @@
+Add/Create new style
+    New media input, write style
+
+Override the whole style system (make a table menu?)
+    Don't import the classes/override media
+        
+Add/Remove HTML components
+    New template
+
+Deal with different data (rare)
+    New itemView, maybe itemhandler
+
+Add new kind of menu item (e.g. links with descriptions?)
+    New item/handler
+    

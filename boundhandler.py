@@ -22,8 +22,6 @@ class BoundHandler:
     def __init__(self, handler, item_data):
         self.handler = handler
         self.item_data = item_data
-        #? This is mutable and should not be here?
-        #self._is_valid = True
         # used to contruct a tree of BoundHandlers, representing
         # the original item structure
         self.submenu = []
@@ -44,17 +42,19 @@ class BoundHandler:
         # BoundHandler evaluates to True.
         return True
 
-    def get_extended_data(self, valid, trail):
+    def get_initial_context(self, valid, trail):
        '''
-       Extend the config data with handler-configured extension data.
+       Get the configuration data as a context.
+       The config data is extended with handler-configured data. This 
+       data may be informed by other data such as validity results.
        
        @return a dict version of the data. 
        '''
-       d = self.handler.get_extension_data(valid, self, trail)
-       d.update(self.item_data.__dict__)
-       return d
+       ctx = self.item_data.__dict__.copy()
+       self.handler.extend_data(ctx, valid, self, trail)
+       return ctx
        
-    def as_view(self, item_context, view=None, attrs={}):
+    def as_view(self, initial_context, view=None, attrs={}):
         """
         Render the handler by rendering the passed view, adding any HTML
         attributes passed as attrs. If a view isn't specified, use the
@@ -66,76 +66,27 @@ class BoundHandler:
         # add handler view-attrs and views attr. The below will
         # copy info over, protecting the originals
         #? could be cached? Or init?
+        #! use extend logic, not this
         attrs = attrs.copy()
         attrs.update(self.handler.get_view_attrs(view))
         attrs.update(view.attrs)
-
-        #kwargs = {}
-        #if func_supports_parameter(view.render, 'renderer') or func_accepts_kwargs(view.render):
-        #    kwargs['renderer'] = self.form.renderer
-        return view.render(request=None, attrs=attrs, **item_context)
-
-   #@property
-    #def data(self):
-        """
-        Return the data for this BoundField, or None if it wasn't given.
-        """
-        #return self.handler.view.value_from_datadict(self.form.data, self.form.files, self.html_name)
-
-    #def values(self):
-        #"""
-        #Return the value for this BoundField, using the initial value if
-        #the form is not bound or the data otherwise.
-        #"""
-        #data = self.initial
-        #if self.menu.is_bound:
-            #data = self.handler.bound_data(self.data, data)
-        #return self.handler.prepare_data(data)
-
+        return view.render(request=None, attrs=attrs, **initial_context)
+        
+        
     def get_wrap_css_classes(self, finished_data):
         """
         Return a string of space-separated CSS classes for the item wrap.
         """
         classes = self.handler.get_wrap_css_classes(finished_data)
-        #print('classes:')
-        #print(str(classes))
-        #if (self.handler.view.is_disabled):
-        #    classes.add('disabled')
         return classes
 
-    #def set_handler_attr(self, name, v):
-    #    setattr(self.handler, name, v)
-    
+
     @property
     def wrap(self):
         """
         True if this BoundHandler's view should be wrapped.
         """
         return self.handler.view.wrap
-
-    #@property
-    #def is_valid(self):
-        #"""
-        #Did the BoundHandler pass validity. 
-        #Setting the property will take action for changing the 
-        #view. Depending on the attribute 'disable_invalid_items'
-        #(see Menu), the view may be disabled or hidden.
-        #"""
-        #return self._is_valid 
-        
-    #@is_valid.setter
-    #def is_valid(self, v):
-        ## tell the view if it is disabled.
-        ## (if item is hidden, the view is not used at all)
-        #self.handler.view.is_disabled = (not v)
-        #self._is_valid = v
-        
-
-                
-      #@cached_property
-    #def initial(self):
-        #data = self.form.get_initial_for_handler(self.handler, self.name)
-        #return data
 
     def validate(self, request, containing_menu_is_valid):
         '''
@@ -150,21 +101,14 @@ class BoundHandler:
             validated = False
         return validated
 
-        
     def get_view_attrs(self):
         '''
         Attribute dict to be used on every item of this type.
         '''
-        #if not view:
-        #    view = self.handler.view
-        attrs = {}
-          
-        return attrs
+        return {}
 
     def get_view_css_classes(self):
         classes = super().get_view_css_classes()
-        if (self.handler.view.is_expanded):
-            classes.add('disabled')
         return classes
 
        

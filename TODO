@@ -1,14 +1,18 @@
-#? enable querysets
+#? enable (half-dynamic) querysets
 #! make multiple handlers and metaclass
 #! check template and class activation
-#! renaming of ...?
-#! 'name' to 'title'
+#! renaming of ... (lots of tings)?
+#! 'name' to (for URLs) 'title'
 #! try validator operations
-#? absolute/reverse URL
+#? absolute/reverse URLs
 #? chains and URL normalsation (and handler/views?) can be permanently cached?
 #! More refined chain options.
 #! selected chain option
 #! why no submenu indicators on down menu?
 #? real breadcrumbs
-#! rename 'menus' to 'menubase'
 #? pushdown menus good for single line, but z-index down bettor for horizontal bars
+#? include menu config, such as theme, in config files...
+# : Against is Djangos config convention-user decision.
+# : For: nice for a user, and its config material.
+#? app atttributes and classes can be by extending seeds, like the extension data
+#? circular dependencies. Also prescan for missing attributes/ other errors?

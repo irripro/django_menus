@@ -83,7 +83,7 @@ class ItemHandler:
     def get_wrap_css_classes(self, finished_data):
         return set()
         
-    def get_extension_data(self, valid,  bound_handler, trail=[]):
+    def extend_data(self, initial_ctx, valid, bound_handler, trail=[]):
         '''
         Add data to extend the config data.
         When this data is requested, the configuration data is validated 
@@ -95,11 +95,8 @@ class ItemHandler:
         default. However, this method recieves some useful data,
         including the bound handler which called it. This data may be 
         enough to make useful settings to extended data.
-        
-        @return  dict of data to update the initial context.
         '''
-        return {}
-        
+        pass
         
         
         
@@ -127,13 +124,12 @@ class URLHandler(ItemHandler):
         #data[url] = absolute_path(data[url])
         return data
         
-    def get_extension_data(self, valid, bound_handler, trail=[]):
-        d = super(). get_extension_data(valid, trail)
-        d.update({
+    def extend_data(self, initial_ctx, valid, bound_handler, trail=[]):
+        super().extend_data(initial_ctx, valid, bound_handler, trail)
+        initial_ctx.update({
         'selected': (bound_handler in trail),
-        'disabled':  (not valid),
+        'disabled': (not valid),
         })
-        return d
 
     def get_wrap_css_classes(self, finished_data):
         classes = super().get_wrap_css_classes(finished_data)
@@ -154,18 +150,18 @@ class SubmenuHandler(URLHandler):
         super().__init__(**kwargs)
         self.is_expanded = expanded
 
-    def get_extension_data(self, valid,  bound_handler, trail=[]):
-        d = super().get_extension_data(valid, trail)
-        d.update({
-        'expanded' : self.is_expanded or (bound_handler in trail),
-        })        
-        return d
+    def extend_data(self, initial_ctx, valid,  bound_handler, trail=[]):
+        super().extend_data(initial_ctx, valid, bound_handler, trail)
+        initial_ctx.update({
+        'expanded' : (self.is_expanded or (bound_handler in trail)),
+        })  
+
 
     def get_wrap_css_classes(self, finished_data):
         classes = super().get_wrap_css_classes(finished_data)
-        #print('self.is_expanded' + str(self.is_expanded))
+        print('submenu expanded' + str(finished_data))
         classes.add('submenu')
-        if (self.is_expanded or finished_data['expanded']):
+        if (finished_data['expanded']):
             classes.add('expanded')
         return classes
 
