@@ -13,3 +13,7 @@ Deal with different data (rare)
 Add new kind of menu item (e.g. links with descriptions?)
     New item/handler
     
+Add permissions for users
+    Add validators to config or handlers
+
+

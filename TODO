@@ -1,4 +1,27 @@
-#? enable (half-dynamic) querysets
+-- lost urls
+https://www.allmovie.com/movie/shutter-island-v422205/review
+https://www.timeout.com/london/film
+https://www.amazon.co.uk/Shutter-Island-DVD-Leonardo-DiCaprio/dp/B002OHCQJK/ref=sr_1_1?s=dvd&ie=UTF8&qid=1515270372&sr=1-1&keywords=shutter+island
+https://pypi.python.org/pypi?%3Aaction=search&term=django&submit=search
+https://pypi.python.org/pypi/django-menu-generator/1.0.2
+https://github.com/LaLogiaDePython/django-menu-generator
+http://django-menu-generator.readthedocs.io/en/latest/menugeneration.html
+https://pypi.python.org/pypi/django-simple-menu2/2.0.7
+https://django-simple-menu.readthedocs.io/en/latest/usage.html#usage-overview
+https://github.com/borgstrom/django-simple-menu/tree/master/menu/templates
+https://django-simple-menu.readthedocs.io/en/latest/usage.html
+https://pypi.python.org/pypi/django-menu/0.1.11
+https://github.com/rossp/django-menu
+https://pypi.python.org/pypi/django-sitemenu/0.0.4
+https://github.com/Brick85/sitemenu
+--immediate
+#? rename handler file to 'itemhandler.py'
+#? enable (half-dynamic) querysets, then see if filmstatpages example can work
+#! make URL detection more robust, check Django documentation on position, SimpleMenu variation
+#? add string break for namespacing men names with app in template filter (only allows one param)
+#! check cacheing is working how it should, and is good code
+#! enable validation now split from cache, then test disabling works
+-- later
 #! make multiple handlers and metaclass
 #! check template and class activation
 #! renaming of ... (lots of tings)?

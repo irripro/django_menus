@@ -129,27 +129,10 @@ class Menu():
         self.select_trail = select_trail
         self.select_leaf = select_leaf
         self.attrs.update(attrs)
-
-        # internal
-        #self.url_chains = {}
         
         # build initial data
         self.bound_menu = self.get_bound_menu(app_name, menu_name)
         #self.validate(self.bound_menu)
-
-    #def trail_set_handler_attribute(self, name, value):
-       ##? better matches
-       #chain = self.url_chains.get(self.request.path_info)
-       #if (chain):
-           #for bh in chain:
-                #bh.set_handler_attr(name, value)
-             
-    #def trail_leaf_set_handler_attribute(self, name, value):
-       ##? better matches
-       #chain = self.url_chains.get(self.request.path_info)
-       #if (chain):
-           #bh = chain[-1]
-           #bh.set_handler_attr(name, value)
 
     def get_trail(self):
         #? better matches
@@ -312,7 +295,6 @@ class Menu():
     def _validate_recursive(self, 
         bound_menu,
         menu_is_valid=True,
-        #url_chain=[]
         ):
         for bh in bound_menu:
             #bh = self.dispatch(item)
@@ -327,14 +309,10 @@ class Menu():
             #submenu recurse
             #if (hasattr(item, 'submenu') and item.submenu):
             if (isinstance(bh, SubMenu)):
-                #? protect
-                #url_chain.append(bh)
                 self._validate_recursive(
                     bh.submenu, 
                     (item_is_valid and menu_is_valid),
-                    #url_chain
                 )
-                #url_chain.pop()
 
     #like def full_clean(self):
     #! called where? errors < is_valid < [user control]
@@ -347,14 +325,7 @@ class Menu():
         """
         #self._validate_recursive(self.bound_menu) 
         self._validate_recursive(bound_menu) 
-        print(self.chains_to_string())
-        #! request on attribute
-        #if (self.select_trail):
-            #self.trail_set_handler_attribute('is_selected', True)
-        #if (self.select_leaf):
-            #self.trail_leaf_set_handler_attribute('is_selected', True)
-        #if (self.expand_trail):
-            #self.trail_set_handler_attribute('is_expanded', True)
+        #print(self.chains_to_string())
 
 
     def _bind_recursive(self, 
