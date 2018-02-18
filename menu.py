@@ -16,7 +16,7 @@ from django.core.urlresolvers import resolve
 from .manager import MenuManager 
 from .items import URL, SubMenu, Separator
 from .boundhandler import BoundHandler
-from .handlers import SeparatorHandler, URLHandler, SubmenuHandler
+from .itemhandlers import SeparatorHandler, URLHandler, SubmenuHandler
 #from .itemview import SeparatorView, URLView
 
 
@@ -370,7 +370,7 @@ class Menu():
             mm = MenuManager()
             menu = mm.get(app, menu_name)
             if (not menu):
-                raise ImproperlyConfigured('Unable to find menu configuration. app_name:{}: menu_name:{}'.format(app, menu_name)) 
+                raise ImproperlyConfigured('Unable to find menu configuration. app_name:"{}": menu_name:"{}"'.format(app, menu_name)) 
             bound_menu = []
             url_chains = {}
             self._bind_recursive(menu, bound_menu, url_chains) 

@@ -15,22 +15,21 @@ https://github.com/rossp/django-menu
 https://pypi.python.org/pypi/django-sitemenu/0.0.4
 https://github.com/Brick85/sitemenu
 --immediate
-#? rename handler file to 'itemhandler.py'
 #? enable (half-dynamic) querysets, then see if filmstatpages example can work
 #! make URL detection more robust, check Django documentation on position, SimpleMenu variation
-#? add string break for namespacing men names with app in template filter (only allows one param)
+#? add string break for namespacing menu names with app in template filter (only allows one param)
 #! check cacheing is working how it should, and is good code
 #! enable validation now split from cache, then test disabling works
 -- later
 #! make multiple handlers and metaclass
 #! check template and class activation
-#! renaming of ... (lots of tings)?
+#! renaming of ... (lots of things)?
 #! 'name' to (for URLs) 'title'
 #! try validator operations
 #? absolute/reverse URLs
-#? chains and URL normalsation (and handler/views?) can be permanently cached?
-#! More refined chain options.
-#! selected chain option
+#? trails and URL normalsation (and handler/views?) can be permanently cached?
+#! More refined trail options.
+#! selected trail option
 #! why no submenu indicators on down menu?
 #? real breadcrumbs
 #? pushdown menus good for single line, but z-index down bettor for horizontal bars

@@ -8,13 +8,13 @@ By default, the app renders menu data as CSS-only hover-action dropdown menus. T
 
 When to use
 ------------
-This is a sophisticated version of a menu builder. It has an API with similarities to django.Form. Why use a powerful (probably hungry?) app like this? For a simple menu you should not. In Django you can nake a menu in a template by writing in the links, then move or change the menu with a simple rewrite.
+This is a sophisticated version of a menu builder. It has an API with similarities to django.Form. Why use a powerful (probably hungry?) app like this? For a simple menu you should not. In Django write links into a template.
 
-The time to use this app is when you want long-term maintainability. To be able to come back after a year and know how to make substancial changes in minutes. Or when you have a deep menu system and your templates are becoming cluttered and hard to read.
+The time to use this app is when you want long-term maintainability. To be able to come back after a year and know how to make substancial changes. Or when you have a deep menu system and your templates are becoming cluttered.
 
-There are minor reasons also. If you are looking for fancy menus, but are not using front-end bundles like Bootstrap, this app has front-end theming that will get you close quickly. Some of the themes are close to responsive displays; you will only need to style a suitable wrap in the template.  
+There are minor reasons also. If you are looking for fancy menus, but are not using a front-end bundle like Bootstrap, this app has front-end theming. Some of the themes are close to responsive displays; you only need to design a container.  
 
-The app also provides some actions that would be tedious or difficult otherwise. You may have a small menu, but if you would like to auto-expand to the current page, this app can do that.
+The app also provides some actions that would be difficult otherwise. You may have a small menu, but if you would like to auto-expand to the current page, this app can do that.
 
 
 Alternatives
@@ -106,11 +106,9 @@ redsolutioncms.django-menu-proxy 0.1.2
 
 Source description
 ------------------
-Unlike much of my Django code, this app originated in other code, a Django application named 'menu-generator'. I do not have the technical knowhow nor computing capability to fork the project, so started again. 
+Unlike much of my Django code, this app originated in other code, a Django application named 'menu-generator'. I do not have the technical knowhow nor computing capability to fork the project, so started again. The app is now nothing like the elegance of 'menu-generator'. It was rewritten to gather much of the API from Django Forms. So, Menu is like Form. Menu is populated with ItemHandlers (like Fields) which contain ItemViews (like Widgets).
 
-The app is now nothing like the elegance of 'menu-generator'. It was rewritten to gather much of the API from Django Forms. So, Menu is like Form. Menu is populated with ItemHandlers (like Fields) which contain ItemViews (like Widgets).
-
-However, while this will help explain the overall structure, be careful of comparing too closely. Menu is much simpler than Form. The app refines the purpose of ItemHandlers, so they are not like Fields and have important extra abilities. Probably best to say, knowing this app is like Django Forms means you may be able to guess what kind of features it offers and how to use them (for example, yes, you can make custom menu items. You can add special attributes to menu items of one type etc.).  
+However, while this will help explain the overall structure, be careful of comparing too closely. Menu is much simpler than Form. The app refines the purpose of ItemHandlers, so they are not like Fields and have important extra abilities. Probably best to say, knowing this app is like Django Forms means you may be able to guess what kind of features it offers and how to use them (you can make custom menu items. You can add attributes to menu items of one type etc.).  
 
 https://pypi.python.org/pypi/django-menu-generator/1.0.2
 https://github.com/un33k/django-menuware
@@ -190,7 +188,7 @@ Build a menu  configuration in an app. Put it in a file 'menubase.py'. The menu 
     }
   
 
-...
+...TO FINISH...
 
 Data Structure
 --------------

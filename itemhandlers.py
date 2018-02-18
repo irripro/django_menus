@@ -15,13 +15,15 @@ from .boundhandler import BoundHandler
 
 #? make a queryset version
 #? include validators from items?
+#? should allow configuration of attributes by item type?
+# and even media?
 class ItemHandler:
     '''
     Configuration and validation of item data.
-    For eachtype of menu item, there is a handler. The handler contains
+    For each type of menu item, there is a handler. The handler contains
     configuration which is overall for the item. The configuration can 
     be set by the user.
-    Handlers are constructed per menu, then cached across web calls. Any
+    Handlers are constructed per menu, then cached across web calls. Added
     attributes should be regarded as as immutable, and the methods 
     as idempotent. 
     '''
@@ -39,7 +41,7 @@ class ItemHandler:
             view = copy.deepcopy(view)
             
         # handler-defined attrs.
-        #? Not sure about this. Let boundhandler, which also has 
+        #? Not sure about this action. Let boundhandler, which also has 
         # view_attrs, do the job? It's not a big deal, is it?
         #extra_attrs = self.get_view_attrs(view)
         #if extra_attrs:
@@ -81,6 +83,11 @@ class ItemHandler:
         return {}
         
     def get_wrap_css_classes(self, finished_data):
+        '''
+        Add classes to the wrap.
+        The method is supplied with the finished data. This has 
+        extensions added and is is validated.
+        '''
         return set()
         
     def extend_data(self, initial_ctx, valid, bound_handler, trail=[]):
@@ -90,11 +97,15 @@ class ItemHandler:
         and transformed into an initial_context.
         
         Unlike the handler data, which is cached and
-        immutable, the extended data can be modified by other code in 
-        Boundhandler, Menu, etc. The values in the dict act as a 
-        default. However, this method recieves some useful data,
-        including the bound handler which called it. This data may be 
-        enough to make useful settings to extended data.
+        immutable, the extended data return can be modified by other 
+        code in Boundhandler, Menu, etc. The values are then used as a 
+        render context.
+        
+        This method can add immutable data from the handler to the 
+        future context. It also recieves some useful data,
+        including the bound handler which called it. So it can react to
+        information given, modifying the extended data
+        on by item type.
         '''
         pass
         
@@ -159,7 +170,7 @@ class SubmenuHandler(URLHandler):
 
     def get_wrap_css_classes(self, finished_data):
         classes = super().get_wrap_css_classes(finished_data)
-        print('submenu expanded' + str(finished_data))
+        #print('submenu expanded' + str(finished_data))
         classes.add('submenu')
         if (finished_data['expanded']):
             classes.add('expanded')
