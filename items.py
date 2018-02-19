@@ -86,7 +86,7 @@ class QuerySet():
     @param queryset can be any iterable of queries (including a dict)
     @param title_field to query for the title.
     @param url_field to query for url ids. This is fed to the template.
-    @param url_template a template used to form urls/hrefs.
+    @param url_template a template used to form urls/hrefs. Must accept the data from url_field.
     @param use_absolute_url override the url creation attributes and try
     on the model to find an absolute url.
     @param icon_ref 
@@ -141,6 +141,8 @@ class QuerySet():
         if (url_template):
             self.url_template = url_template
         else:
+            # Guess what a likely URL format may be
+            #? (cant help but feel Django may have similar code somewhere) 
             self.url_template = '{}{}{}{}{}{{}}'.format(
               os.sep,
               self.model._meta.app_label,

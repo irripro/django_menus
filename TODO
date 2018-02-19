@@ -15,12 +15,12 @@ https://github.com/rossp/django-menu
 https://pypi.python.org/pypi/django-sitemenu/0.0.4
 https://github.com/Brick85/sitemenu
 --immediate
-#? enable (half-dynamic) querysets, then see if filmstatpages example can work
 #! make URL detection more robust, check Django documentation on position, SimpleMenu variation
 #? add string break for namespacing menu names with app in template filter (only allows one param)
 #! check cacheing is working how it should, and is good code
 #! enable validation now split from cache, then test disabling works
 -- later
+#? where would 'attrs' parameter injection be most useful?
 #! make multiple handlers and metaclass
 #! check template and class activation
 #! renaming of ... (lots of things)?
@@ -29,12 +29,11 @@ https://github.com/Brick85/sitemenu
 #? absolute/reverse URLs
 #? trails and URL normalsation (and handler/views?) can be permanently cached?
 #! More refined trail options.
-#! selected trail option
 #! why no submenu indicators on down menu?
 #? real breadcrumbs
-#? pushdown menus good for single line, but z-index down bettor for horizontal bars
+#? pushdown menus good for single line, but z-index down better for horizontal bars
 #? include menu config, such as theme, in config files...
-# : Against is Djangos config convention-user decision.
+# : Against is Djangos config convention-'user decision'.
 # : For: nice for a user, and its config material.
 #? app atttributes and classes can be by extending seeds, like the extension data
 #? circular dependencies. Also prescan for missing attributes/ other errors?
