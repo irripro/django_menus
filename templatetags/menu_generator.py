@@ -6,7 +6,7 @@ from django.core.exceptions import ImproperlyConfigured
 register = template.Library()
 
 from ..manager import MenuManager
-from ..menu import Menu, EXACT, TAIL
+from ..menu import Menu, EXACT, TAIL1, TAIL2, HEAD1, HEAD2
 
 
 
@@ -34,8 +34,14 @@ def get_menu(context, menu_url):
                 v = True
             if (v == 'EXACT'):
                 v = EXACT
-            if (v == 'TAIL'):
-                v = TAIL
+            if (v == 'TAIL1'):
+                v = TAIL1
+            if (v == 'TAIL2'):
+                v = TAIL2
+            if (v == 'HEAD1'):
+                v = HEAD1
+            if (v == 'HEAD2'):
+                v = HEAD2
             query[k] = v 
     #print(menu_name + 'query:' + str(query))
     except Exception:

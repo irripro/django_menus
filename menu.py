@@ -24,9 +24,19 @@ from .itemhandlers import SeparatorHandler, URLHandler, SubmenuHandler
 def EXACT(request_path):
     return request_path
 
-def TAIL(request_path):    
-    return request_path.rsplit(os.sep, 1)[1]
+def TAIL1(request_path):    
+    return request_path.rsplit(os.sep, 1)[-1]
 
+def TAIL2(request_path):    
+    return os.sep.join(request_path.rsplit(os.sep, 2)[-2:])
+    
+def HEAD1(request_path):  
+    #? would fail on empty path?
+    return os.sep.join(request_path.split(os.sep, 2)[:2])
+
+def HEAD2(request_path):  
+    #? would fail on empty path?
+    return os.sep.join(request_path.split(os.sep, 3)[:3])
     
 #! media
 #! handle empty menus?

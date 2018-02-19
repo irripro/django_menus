@@ -280,6 +280,44 @@ select_leaf
     deep it is nested), the menu has CSS class 'select' on the target item.
 
 
+Trail matching
+++++++++++++++
+If the configuration has URL items (likely), then Menu will build a trail
+through the configuration to them.
+
+Sometimes it is useful not to want an exact match. A user visits a shop,
+the site builders provide a menu for the departments, the user would 
+like to see the department selected. The user is at, ::
+
+    /jewellery/bangles/plastic/43
+
+The department menu contains only configuration for, ::
+
+    URL("Jewellery", "/jewellery"),
+    URL("Garden", "/garden"),
+    URL("Lighting", "/lighting"),
+    ...
+
+You can define a different match_key function for the menu. A handful 
+of key-defining functions are builtin. If the menu in the template (or any Menu) defines, ::
+
+        {% get_menu "site/DEPARTMENT_MENU?trail_key=HEAD1;select_leaf=True" as site_menu %}
+
+then HEAD1 strips the path, ::
+
+    /jewellery/bangles/plastic/43
+
+to, ::
+
+    /jewellery
+    
+before a match is tried. Now it matches and the /jewellery item in the 
+department menu will be selected.
+
+TAIL match_key functions can also be used. These are useful for tab-type
+menus.
+
+
 Placement
 ~~~~~~~~~
 The HTML can be placed in a template in two ways. You can use a view and place the output onto a context, then render in the template. This allows customization, because the Menu class allows several custom settings, and custom handling of how item data is rendered, ::
@@ -319,7 +357,7 @@ Not only that, but the little URL allows you to put init parameters into Menu. T
           {{ site_menu }}
         </ul>
 
-Don't expect muchof the URL parse code. If you are wondering, yes, the URL means the app can work round the one-parameter-only limitation of Django template filters. 
+Don't expect much of the URL parse code. If you are wondering, yes, the URL means the app can work round the one-parameter-only limitation of Django template filters. 
         
         
 Action and Styling
