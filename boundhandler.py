@@ -19,7 +19,8 @@ class BoundHandler:
     Bind a handler with a view instance and accept data.
     One is constructed for every menu item. Cached across web calls.
     '''
-    def __init__(self, handler, item_data):
+    def __init__(self, menu, handler, item_data):
+        self.menu = menu
         self.handler = handler
         self.item_data = item_data
         # used to contruct a tree of BoundHandlers, representing
@@ -51,7 +52,7 @@ class BoundHandler:
        @return a dict version of the data. 
        '''
        ctx = self.item_data.__dict__.copy()
-       self.handler.extend_data(ctx, valid, self, trail)
+       self.handler.extend_data(ctx, self.menu, self, valid, trail)
        return ctx
        
     def as_view(self, initial_context, view=None, attrs={}):

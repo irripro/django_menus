@@ -1,15 +1,12 @@
 from django import template
 #from django.conf import settings
 
-#from .utils import get_menu_from_apps
-#from .. import defaults
-#from django.utils.safestring import mark_safe
+from django.core.exceptions import ImproperlyConfigured
 
 register = template.Library()
 
 from ..manager import MenuManager
 from ..menu import Menu, EXACT, TAIL
-from urllib import parse
 
 
 
@@ -23,10 +20,8 @@ def get_menu(context, menu_url):
     :param menu_name: Path of the menu to be found: app_name ~ '/' ~ menu_name ~ Optional('?' ~ OneOrMoreore(initkey ~ '=' ~ initValue ~ ';'))
     """
     s = menu_url.split('?', 1) 
-
     menu_path = s[0]
     menu_app, menu_name = menu_path.split('/', 1) 
-
     query = {}
     try:
         if (len(s) > 1):
@@ -45,6 +40,6 @@ def get_menu(context, menu_url):
     #print(menu_name + 'query:' + str(query))
     except Exception:
         raise ImproperlyConfigured('Django menu configuration URL can not be parsed: url:"{}"'.format(menu_url))
-    m = Menu(context.request, menu_name, menu_app, **query) #, select_leaf=True)
+    m = Menu(context.request, menu_name, menu_app, **query)
     return str(m)
 

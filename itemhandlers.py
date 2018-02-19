@@ -90,22 +90,22 @@ class ItemHandler:
         '''
         return set()
         
-    def extend_data(self, initial_ctx, valid, bound_handler, trail=[]):
+    def extend_data(self, initial_ctx, menu, bound_handler, valid, trail=[]):
         '''
         Add data to extend the config data.
         When this data is requested, the configuration data is validated 
         and transformed into an initial_context.
         
         Unlike the handler data, which is cached and
-        immutable, the extended data return can be modified by other 
-        code in Boundhandler, Menu, etc. The values are then used as a 
-        render context.
+        immutable, the extended data has been copied so can be modified 
+        by other code in Boundhandler, Menu, etc. The values are then 
+        used as a render context.
         
         This method can add immutable data from the handler to the 
-        future context. It also recieves some useful data,
-        including the bound handler which called it. So it can react to
-        information given, modifying the extended data
-        on by item type.
+        future context. It also recieves useful data,
+        including the menu and bound handler which called it. So it can 
+        react to information given, modifying the extended data
+        by item type.
         '''
         pass
         
@@ -135,10 +135,10 @@ class URLHandler(ItemHandler):
         #data[url] = absolute_path(data[url])
         return data
         
-    def extend_data(self, initial_ctx, valid, bound_handler, trail=[]):
-        super().extend_data(initial_ctx, valid, bound_handler, trail)
+    def extend_data(self, initial_ctx, menu, bound_handler, valid, trail=[]):
+        super().extend_data(initial_ctx, menu, valid, bound_handler, trail)
         initial_ctx.update({
-        'selected': (bound_handler in trail),
+        'selected': ((menu.select_trail or menu.select_leaf) and (bound_handler in trail)),
         'disabled': (not valid),
         })
 
@@ -161,10 +161,10 @@ class SubmenuHandler(URLHandler):
         super().__init__(**kwargs)
         self.is_expanded = expanded
 
-    def extend_data(self, initial_ctx, valid,  bound_handler, trail=[]):
-        super().extend_data(initial_ctx, valid, bound_handler, trail)
+    def extend_data(self, initial_ctx, menu, bound_handler, valid, trail=[]):
+        super().extend_data(initial_ctx, menu, valid, bound_handler, trail)
         initial_ctx.update({
-        'expanded' : (self.is_expanded or (bound_handler in trail)),
+        'expanded' : (self.is_expanded or (menu.expand_trail and bound_handler in trail)),
         })  
 
 

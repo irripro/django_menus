@@ -19,6 +19,8 @@ from .items import URL, SubMenu, Separator
 from .boundhandler import BoundHandler
 from .itemhandlers import SeparatorHandler, URLHandler, SubmenuHandler
 
+
+# Builtin URL matchers
 def EXACT(request_path):
     return request_path
 
@@ -119,6 +121,7 @@ class Menu():
         '''
         #? better matches
         trail = []
+        #? why bother with the test?
         if (self.expand_trail or self.select_trail or self.select_leaf):
             trails = self.get_trails()
             #print('trails:' + str(trails))
@@ -142,6 +145,7 @@ class Menu():
         handler = self.handlers.get(menu_item_data.__class__)
         #if (not handler):
         return BoundHandler(
+            self,
             handler(),
             menu_item_data
             )
@@ -182,7 +186,7 @@ class Menu():
                 #! can be boolean
                 visible_count += 1
                 
-                # extend the data first (this sets some dynamic 
+                # extend the data (this sets some dynamic 
                 # configuration)
                 ctx = bh.get_initial_context(valid, trail)
 
