@@ -1,50 +1,50 @@
 from django import template
-from django.conf import settings
+#from django.conf import settings
 
-from .utils import get_menu_from_apps
-from .. import defaults
-#from ..menu import generate_menu
-from django.utils.safestring import mark_safe
+#from .utils import get_menu_from_apps
+#from .. import defaults
+#from django.utils.safestring import mark_safe
 
-#from ..renderers import MenuRenderer
 register = template.Library()
 
 from ..manager import MenuManager
-#from ..menu_handler import Menu
-from ..menu import Menu
+from ..menu import Menu, EXACT, TAIL
+from urllib import parse
 
-# [{'url': '/app1-feature', 'submenu': None, 'icon_class': '', 'selected': False, 'name': 'App1 Feature'}, {'url': '/about', 'submenu': None, 'icon_class': '', 'selected': False, 'name': 'About'}]
 
 
 @register.assignment_tag(takes_context=True)
-def get_menu(context, menu_path):
+def get_menu(context, menu_url):
     """
-    Returns a consumable menu list for a given menu_name found in settings.py.
-    Else it returns an empty list.
+    Returns menu HTML for a menu path to a configuration.
+    The menu is currently pre-configured to expand and select.
+    Else it returns an empty list?
 
-    Update, March 18 2017: Now the function get the menu list from settings and append more items if found on the
-    menus.py's 'MENUS' dict.
-    :param context: Template context
-    :param menu_name: String, name of the menu to be found
-    :return: Generated menu
+    :param menu_name: Path of the menu to be found: app_name ~ '/' ~ menu_name ~ Optional('?' ~ OneOrMoreore(initkey ~ '=' ~ initValue ~ ';'))
     """
-    print('......get_menu')
+    s = menu_url.split('?', 1) 
 
-    #menu_list = getattr(settings, menu_name, defaults.MENU_NOT_FOUND)
-    #menu_from_apps = get_menu_from_apps(menu_name)
-    ## If there isn't a menu on settings but there is menu from apps we built menu from apps
-    #if menu_list == defaults.MENU_NOT_FOUND and menu_from_apps:
-        #menu_list = menu_from_apps
-    ## It there is a menu on settings and also on apps we merge both menus
-    #elif menu_list != defaults.MENU_NOT_FOUND and menu_from_apps:
-        #menu_list += menu_from_apps
-    ##print(str(menu_list))
-    ##return generate_menu(context['request'], menu_list)
-    #visible_menu = generate_menu(context['request'], menu_list)
-    #return MenuRenderer(visible_menu).as_ul()
-    #mm = MenuManager()
-    #md = mm('filmstat', 'NAV_MENU_TOP')
+    menu_path = s[0]
     menu_app, menu_name = menu_path.split('/', 1) 
-    m = Menu(context.request, menu_name, menu_app, expand_trail=True, select_trail=True) #, select_leaf=True)
+
+    query = {}
+    try:
+        if (len(s) > 1):
+          kvs = s[1].split(';')
+          for kv in kvs:
+            k, v = kv.split('=')
+            if (v == 'False'):
+                v = False
+            if (v == 'True'):
+                v = True
+            if (v == 'EXACT'):
+                v = EXACT
+            if (v == 'TAIL'):
+                v = TAIL
+            query[k] = v 
+    #print(menu_name + 'query:' + str(query))
+    except Exception:
+        raise ImproperlyConfigured('Django menu configuration URL can not be parsed: url:"{}"'.format(menu_url))
+    m = Menu(context.request, menu_name, menu_app, **query) #, select_leaf=True)
     return str(m)
 

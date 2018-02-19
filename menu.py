@@ -1,4 +1,5 @@
 import copy
+import os
 
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse, NoReverseMatch
@@ -17,45 +18,14 @@ from .manager import MenuManager
 from .items import URL, SubMenu, Separator
 from .boundhandler import BoundHandler
 from .itemhandlers import SeparatorHandler, URLHandler, SubmenuHandler
-#from .itemview import SeparatorView, URLView
 
+def EXACT(request_path):
+    return request_path
 
+def TAIL(request_path):    
+    return request_path.rsplit(os.sep, 1)[1]
 
-class DeclarativeFieldsMetaclass(MediaDefiningClass):
-    """Collect Fields declared on the base classes."""
-    def __new__(mcs, name, bases, attrs):
-        # Collect fields from current class.
-        current_fields = []
-        for key, value in list(attrs.items()):
-            if isinstance(value, Handler):
-                current_fields.append((key, value))
-                attrs.pop(key)
-        attrs['declared_fields'] = OrderedDict(current_fields)
-
-        new_class = super(DeclarativeFieldsMetaclass, mcs).__new__(mcs, name, bases, attrs)
-
-        # Walk through the MRO.
-        declared_fields = OrderedDict()
-        for base in reversed(new_class.__mro__):
-            # Collect fields from base class.
-            if hasattr(base, 'declared_fields'):
-                declared_fields.update(base.declared_fields)
-
-            # Field shadowing.
-            for attr, value in base.__dict__.items():
-                if value is None and attr in declared_fields:
-                    declared_fields.pop(attr)
-
-        new_class.base_fields = declared_fields
-        new_class.declared_fields = declared_fields
-
-        return new_class
-
-    @classmethod
-    def __prepare__(metacls, name, bases, **kwds):
-        # Remember the order in which form fields are defined.
-        return OrderedDict()
-        
+    
 #! media
 #! handle empty menus?
 #! 'active' not enabled
@@ -74,13 +44,17 @@ class Menu():
     Base class that generates menu list.
     
     @param menu [{menu item}, ...]
+    @param trail_key a callable to convert the request path into keys 
+    for URL trails. Default is EXACT (all the request path must match 
+    the configured URLs)
     @param attrs to add to menu items
     """
-    # unmutable
+    # immutable
     #? maybe for submenus also
-    media = Media(
-        css = {'all':'/django_menus/dropdown.css'}
-    )
+    #? what is a good default here? Nothing?
+    media = Media()
+    #    css = {'all':'/django_menus/dropdown.css'}
+    #)
 
     handlers = {
         SubMenu: SubmenuHandler,
@@ -100,10 +74,10 @@ class Menu():
     #url_chains = {}
         
     def __init__(self, request, 
-        #menu=None,
         menu_name,
         app_name=None,
         disable_invalid=None,
+        trail_key=EXACT,
         expand_trail=False,
         select_trail=False,     
         select_leaf=False,     
@@ -127,6 +101,7 @@ class Menu():
         
         if disable_invalid is not None:
             self.disable_invalid = disable_invalid
+        self.trail_key = trail_key
         self.expand_trail = expand_trail
         self.select_trail = select_trail
         self.select_leaf = select_leaf
@@ -137,13 +112,19 @@ class Menu():
         #self.validate(self.bound_menu)
 
     def get_trail(self):
+        '''
+        If the request is matched against menu data, get a trail.
+        
+        @return the trail, or empty trail (list)
+        '''
         #? better matches
         trail = []
-        if (self.select_trail or self.select_leaf):
+        if (self.expand_trail or self.select_trail or self.select_leaf):
             trails = self.get_trails()
-            #print('trails:' + str(trails))    
-            print('self.request.path_info:' + str(self.request.path_info))    
-            t = trails.get(self.request.path_info)
+            #print('trails:' + str(trails))
+            print('self.request.path_info:' + str(self.request.path_info))
+            key = self.trail_key(self.request.path_info)
+            t = trails.get(key)
             if (t):
                 trail = t
             #trail = self.url_chain_cache[self.app].get(self.request.path_info)

@@ -118,7 +118,7 @@ Some hints are taken from the Drupal module NiceMenus_. And the old Drupal route
 
 Current state
 -------------
-As it arrives. No guarentees.
+As it arrives. No guarentees. But working.
 
 
 Installation
@@ -196,7 +196,7 @@ In the template, you need to load the tag code, then a couple of imports for bas
     <link href={% static 'django_menus/django_menu_base.css' %} type="text/css" media="all" rel="stylesheet">
     <link href={% static 'django_menus/django_menu_too_cool_to_be_hip.css' %} type="text/css" media="all" rel="stylesheet">
 
-        # Note the menu name is a little path: app_name + '/' + menu_name
+        # Note the menu name is a little URL: app_name + '/' + menu_name
         {% get_menu "site/NAV_MENU_SITE" as site_menu %}
 
         <ul class="dmenu dmenu-css dmenu-right dmenu-horizontal dm-toocool">
@@ -282,7 +282,7 @@ select_leaf
 
 Placement
 ~~~~~~~~~
-The HTML can be placed in a template in two ways. You can use a view and place the output onto a context, then render in the template. This allows customization, because the Menu class allows several custom settings (see above), and custom handling of how item data is rendered, ::
+The HTML can be placed in a template in two ways. You can use a view and place the output onto a context, then render in the template. This allows customization, because the Menu class allows several custom settings, and custom handling of how item data is rendered, ::
 
     def get_context():
         ...
@@ -297,7 +297,7 @@ But most people will not need that. If you do not, you can output from the templ
 
         ...
         
-        # Note the menu name is a little path: app_name + '/' + menu_name
+        # Note the menu name is a little URL: app_name + '/' + menu_name
         {% get_menu "site/NAV_MENU_SITE" as site_menu %}
 
         <ul class="dmenu dmenu-css dmenu-right dmenu-horizontal">
@@ -305,6 +305,21 @@ But most people will not need that. If you do not, you can output from the templ
         </ul>
 
 Note the little path used to refer to the menu. Django_menu uses the app name to namespace menus. So you can have two 'SIDEBAR_MENU's in the same installation, if they are in different apps.
+
+Not only that, but the little URL allows you to put init parameters into Menu. This is nowhere near the level of customisation available from using a context and subclassing, but useful, e.g. ::
+
+    {% load menu_generator %}
+
+        ...
+        
+        # Note the menu name is a little URL: app_name + '/' + menu_name
+        {% get_menu "site/NAV_MENU_SITE?trail_key=TAIL;expanded=True;" as site_menu %}
+
+        <ul class="dmenu dmenu-css dmenu-right dmenu-horizontal">
+          {{ site_menu }}
+        </ul>
+
+Don't expect muchof the URL parse code. If you are wondering, yes, the URL means the app can work round the one-parameter-only limitation of Django template filters. 
         
         
 Action and Styling

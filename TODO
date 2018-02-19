@@ -15,6 +15,9 @@ https://github.com/rossp/django-menu
 https://pypi.python.org/pypi/django-sitemenu/0.0.4
 https://github.com/Brick85/sitemenu
 --immediate
+#? fuzzy match
+#! Selecting when expanding (only?)
+#! menu styling inheriting data small caps
 #! make URL detection more robust, check Django documentation on position, SimpleMenu variation
 #? add string break for namespacing menu names with app in template filter (only allows one param)
 #! check cacheing is working how it should, and is good code
