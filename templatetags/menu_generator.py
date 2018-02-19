@@ -17,7 +17,7 @@ from ..menu import Menu
 
 
 @register.assignment_tag(takes_context=True)
-def get_menu(context, menu_name):
+def get_menu(context, menu_path):
     """
     Returns a consumable menu list for a given menu_name found in settings.py.
     Else it returns an empty list.
@@ -44,6 +44,7 @@ def get_menu(context, menu_name):
     #return MenuRenderer(visible_menu).as_ul()
     #mm = MenuManager()
     #md = mm('filmstat', 'NAV_MENU_TOP')
-    m = Menu(context.request, 'NAV_MENU_TOP', app_name='filmstat', expand_trail=True, select_trail=True) #, select_leaf=True)
+    menu_app, menu_name = menu_path.split('/', 1) 
+    m = Menu(context.request, menu_name, menu_app, expand_trail=True, select_trail=True) #, select_leaf=True)
     return str(m)
 

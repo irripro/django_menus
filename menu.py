@@ -112,6 +112,8 @@ class Menu():
         self.request = request
         #print('..........request:')
         #print(str(request))
+        print(str(menu_name))
+        print('..........menu_name:' + menu_name)
         if (not app_name):
             app_name = resolve(request.path).app_name
             if (not app_name):

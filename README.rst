@@ -140,7 +140,7 @@ Like the Django Form class, Menu output has no surrounding div, ul, or table tag
 
     {% load menu_generator %}
 
-    {% get_menu "NAV_MENU_LEFT" as site_menu %}
+    {% get_menu "site/NAV_MENU_LEFT" as site_menu %}
     <ul>
       {{ site_menu }}
     </ul>
@@ -196,8 +196,8 @@ In the template, you need to load the tag code, then a couple of imports for bas
     <link href={% static 'django_menus/django_menu_base.css' %} type="text/css" media="all" rel="stylesheet">
     <link href={% static 'django_menus/django_menu_too_cool_to_be_hip.css' %} type="text/css" media="all" rel="stylesheet">
 
-
-        {% get_menu "NAV_MENU_SITE" as site_menu %}
+        # Note the menu name is a little path: app_name + '/' + menu_name
+        {% get_menu "site/NAV_MENU_SITE" as site_menu %}
 
         <ul class="dmenu dmenu-css dmenu-right dmenu-horizontal dm-toocool">
           {{ site_menu }}
@@ -297,12 +297,15 @@ But most people will not need that. If you do not, you can output from the templ
 
         ...
         
-        {% get_menu "NAV_MENU_SITE" as site_menu %}
+        # Note the menu name is a little path: app_name + '/' + menu_name
+        {% get_menu "site/NAV_MENU_SITE" as site_menu %}
 
         <ul class="dmenu dmenu-css dmenu-right dmenu-horizontal">
           {{ site_menu }}
         </ul>
 
+Note the little path used to refer to the menu. Django_menu uses the app name to namespace menus. So you can have two 'SIDEBAR_MENU's in the same installation, if they are in different apps.
+        
         
 Action and Styling
 ~~~~~~~~~~~~~~~~~~ 
@@ -344,7 +347,7 @@ django_menu_base.css delivers basic positioning and CSS action for a menu. Add t
 
         {% load menu_generator %}
 
-        {% get_menu "SITE_MENU" as site_menu %}
+        {% get_menu "site/SITE_MENU" as site_menu %}
         <ul class="dmenu dmenu-css dmenu-right dmenu-horizontal">
           {{ site_menu }}
         </ul>        
@@ -357,7 +360,7 @@ You can mix these CSS modules (though they can give wierd results). No direction
 
         {% load menu_generator %}
 
-        {% get_menu "SITE_MENU" as site_menu %}
+        {% get_menu "site/SITE_MENU" as site_menu %}
         <ul class="dmenu dmenu-css">
           {{ site_menu }}
         </ul>  
@@ -372,7 +375,7 @@ Then add the theme class to the wrapping UL tags, ::
 
         {% load menu_generator %}
 
-        {% get_menu "SITE_MENU" as site_menu %}
+        {% get_menu "site/SITE_MENU" as site_menu %}
         <ul class="dmenu dmenu-css dmenu-right dmenu-horizontal dm-desktop">
           {{ site_menu }}
         </ul> 
@@ -394,7 +397,7 @@ Ok, let's try a push-down theme, ::
 
     {% load menu_generator %}
 
-    {% get_menu "SITE_MENU" as site_menu %}
+    {% get_menu "site/SITE_MENU" as site_menu %}
     <ul class="dmenu dmenu-css dm-machinery">
       {{ site_menu }}
     </ul> 
