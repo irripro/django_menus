@@ -217,7 +217,7 @@ Half-dynamic construction
 +++++++++++++++++++++++++
 One of the MenuItems is not a subclass of MenuItem, but is a Menutem generator. It is called QuerySet.
 
-Queryset can construct menu items by querying the database. However, django_menus is an app that uses static, cached, data. So the results of a QuerySet injection are static and cached. The DB Query is only made once, when the server boots. To make the query again, the server will need to be rebooted.
+Queryset can construct menu items by querying the database. However, django_menus is an app that uses static, cached, data. So the results of a QuerySet injection are static and cached. The DB query is only made once, when the server boots. To make the query again, the server will need to be rebooted.
  
 QuerySet is a very configurable class. It can be subcalssed to preset most of it's attributes, or set through the init parameters (like a Django View). Here is an example of QuerySet being used to recover a set of page objects, then transform them into MenuItems, ::
 
@@ -237,9 +237,9 @@ Queryset makes some efforts to guess input parameters. If not given a url_field,
  
 Let's talk about what QuerySet can and can not do. You can not construct menus from free-flowing datasets. For example, QuerySet will not produce lists of users on a social media site, or a list of products for a shop. The server would need to be restarted when a new user or product was added (NB: I decided, somewhere in the middle of the construction, not to make a full-dynamic menu system. The DB hits would be multiple, despite Django ORM caching. And it would make the app a complex and hybrid codebase, for not much gain).
 
-However, some data is not free-flowing. It is changed rarely, and you could justify a server restart for such data changes. I'm thinking now of fundamental changes to an administation interface, or a list of departments on a shopping site. Or, as in the example above, extra support pages for a small site. QuerrySet can produce such lists, and produce them using a very DRY configuration (i.e. the above example is one line, for several menu entries, which are generated, on a restart, automatically). 
+However, some data is not free-flowing. It is changed rarely, and you could justify a server restart for such data changes. I'm thinking now of fundamental changes to an administation interface, or a list of departments on a shopping site. Or, as in the example above, support pages for a small site. QuerySet can produce such lists, and produce them using a very DRY configuration (i.e. the above example is one line, for several menu entries, which are generated, on a restart, automatically). 
 
-Incidentally, this is a mechanism used by other URL systems. Django's URL handling works like this, as does the router in the Drupal CMS. Though configuarable, they need restarts, so they can cache and be efficient (though Drupal offers cache-expiry). Django_menus is not as extensive as those apps, but you can think of the app in the same way.
+Incidentally, this is a mechanism used by other URL systems. Django's URL handling works like this, as does the router in the Drupal CMS. Though configuarable, they need restarts, so they can cache (though Drupal offers cache-expiry). Django_menus is not as extensive as those apps, but you can think of the app in the same way.
 
 
 MenuManager
@@ -255,7 +255,7 @@ Menu
 ~~~~~
 Handles overall menu construction. Which means storage, validation, and rendering. Output can be as DIV or LI. Call str() and Menu will output with the default, LI, ::
 
-    > Menu('site menu', app_name='site-app', expand_trail=True)
+    > Menu('SITE_MENU', app_name='site-app', expand_trail=True)
 
 Menu also builds what are called 'URL trails'. Any menu item data which contains a 'url' attribute is checked, and the path noted in a dict of paths. Matching the end point of these trails against requests, Menu can guess if the current page is in the menu. If it is, menu can add classes to display that item in various ways.
 
@@ -267,34 +267,36 @@ Options
 +++++++
 disable_invalid
     If true, and a menu item fails validation, it is not hidden (the 
-    default) but 'greyed out' and anchor menu items are nulled (similar 
+    default) but 'greyed out' and hrefs removed (similar 
     to a desktop GUI showing non-applicable actions). 
 expand_trail
     If True, and the current page can be found in the trails (however 
     deep it is nested), the menu is expanded to show that item.
 select_trail
     If True, and the current page can be found in the trails (however 
-    deep it is nested), the menu has 'select' styling on the trail items.
+    deep it is nested), the menu has CSS class 'select' on the trail items.
 select_leaf
     If True, and the current page can be found in the trails (however 
-    deep it is nested), the menu has 'select' styling on the target item.
+    deep it is nested), the menu has CSS class 'select' on the target item.
 
 
 Placement
 ~~~~~~~~~
-The menu HTML can be placed in a template in two ways. You can use a view and place the output onto a context, then render in the template. This allows much greater customization, because the Menu class allows several custom settings (see above), and also custom handling of how item data is handled and rendered.
+The HTML can be placed in a template in two ways. You can use a view and place the output onto a context, then render in the template. This allows customization, because the Menu class allows several custom settings (see above), and custom handling of how item data is rendered, ::
 
-def get_context():
-    ...
-    context.update({
-        'menu': Menu('site menu', app_name='site-app', expand_trail=True)
-    })
-    return context
-   
+    def get_context():
+        ...
+        context.update({
+            'menu': Menu('site menu', app_name='site-app', expand_trail=True)
+        })
+        return context
+       
 But most people will not need that. If you do not, you can output from the template using the template tag, ::
 
     {% load menu_generator %}
 
+        ...
+        
         {% get_menu "NAV_MENU_SITE" as site_menu %}
 
         <ul class="dmenu dmenu-css dmenu-right dmenu-horizontal">
@@ -306,9 +308,9 @@ Action and Styling
 ~~~~~~~~~~~~~~~~~~ 
 The output from Menu is HTML. From there you may wish to devise your own style. Or it may be that you want to modify the HTML to work with existing CSS (and JS?) from another source. That's ok, the section below is optional and entirely separate from the HTML generation.
 
-But maybe you want a menu and have no framework you need to match. Or you want to style the menus to match the site. Django_menus comes with a full action/theming structure you can follow. Or get some inspiration and a start.
+But maybe you want a menu and have no framework you need to match. Or you want to style the menus to match a site. Django_menus comes with a full action/theming structure you can follow. Or get some inspiration and a start.
 
-The basic action is a 'hover'-action CSS only menu. There are options to turn the menus into 'click'-action using Javascript. You'll need to skip down to see how to do that. 
+The basic action is a 'hover'-action CSS-only menu. There are options to turn the menus into 'click'-action using Javascript. You'll need to skip down to see how to do that. 
 
 
 I should claim how fabulous this is, which it can be. However, I've not worked the code through. Some options and themes can give strange and marvelous results. But give it a go because, if it gets you part-way down the road, that's a start, right?
@@ -362,11 +364,11 @@ You can mix these CSS modules (though they can give wierd results). No direction
         
 Anyway, the menu looks tidier. More importantly, if you hover elements, you will find the menu operates as you asked. But it looks... basic. The menu may open in wild positions (these classes set no widths/heights/borders etc.).
 
-You can add your own CSS, via Media or directly. Or you can have a look at the sample themes. Themes are in django_menu/static/... Add this to load one, ::
+You can add your own CSS, via Media or directly. Or you can have a look at the sample themes. Themes are in django_menu/static/... Add this to load the 'desktop' theme, ::
 
     <link href={% static 'django_menus/django_menu_desktop.css' %} type="text/css" media="all" rel="stylesheet">
 
-Then add this class inside the file to the wrapping UL tags, ::
+Then add the theme class to the wrapping UL tags, ::
 
         {% load menu_generator %}
 
