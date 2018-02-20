@@ -15,11 +15,7 @@ https://github.com/rossp/django-menu
 https://pypi.python.org/pypi/django-sitemenu/0.0.4
 https://github.com/Brick85/sitemenu
 --immediate
-#? fuzzy match
-#! Selecting when expanding (only?)
-#! menu styling inheriting data small caps
 #! make URL detection more robust, check Django documentation on position, SimpleMenu variation
-#? add string break for namespacing menu names with app in template filter (only allows one param)
 #! check cacheing is working how it should, and is good code
 #! enable validation now split from cache, then test disabling works
 -- later
@@ -30,8 +26,7 @@ https://github.com/Brick85/sitemenu
 #! 'name' to (for URLs) 'title'
 #! try validator operations
 #? absolute/reverse URLs
-#? trails and URL normalsation (and handler/views?) can be permanently cached?
-#! More refined trail options.
+#? trails and URL normalization (and handler/views?) can be permanently cached?
 #! why no submenu indicators on down menu?
 #? real breadcrumbs
 #? pushdown menus good for single line, but z-index down better for horizontal bars

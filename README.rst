@@ -465,13 +465,39 @@ So,
 Maybe pushing it there, huh, son?
 
 
-Click-action Javascript menus
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+'click'-action Javascripted menus
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+There is also a Javascript solution (which uses the JQuery from Django admin). Javascript action offers a fundamentally different experience, as the menu will not work on hover, but on clicking. This may or may not be a preference. Click actions also influence design (hover themes will not work well for click themes, and visa-versa). Before you ask, yes, I know CSS can do click menus, and that JS can do hover menus. I decided against both paths. If you, the reader, want to prove something, go ahead.
+
+We need to put the Javascript into the template (or our menu will be unwantedly static). Here is everything you need, plus a theme, for the template head (or Media). So; JQuery, Django JQuery init, the menu JS code, the CSS base and theme, ::
 
 
+    <script type="text/javascript" src={% static 'admin/js/vendor/jquery/jquery.min.js' %}></script>
+    <script type="text/javascript" src={% static 'admin/js/jquery.init.js' %}></script>
+    <script src={% static 'django_menus/js/django_menu.js' %}></script>
+    <link href={% static 'django_menus/django_menu_base.css' %} type="text/css" media="all" rel="stylesheet">
+    <link href={% static 'django_menus/django_menu_professional_sale.css' %} type="text/css" media="all" rel="stylesheet">            
+  
+Phew. Now, easy, as this is a vertical pushdown menu (the default), ::
+
+        <ul class="dmenu dmenu-js dm-prsale">
+
+PS: a pushdown stacking menu seems to be commonly agreed as one of the best solutions for a responsive design.
+
+I built this theme, and I'm sure it could make some people happy,
+
+.. figure:: https://raw.githubusercontent.com/rcrowther/django_menus/master/docs/images/ps_menu.png
+    :width: 160 px
+    :alt: menu screenshot
+    :align: center
+
+
+It's not my idea of good, though. It probably needs to go in an overlay or something.
+
+  
 Tabs
 ~~~~
-Tabs are web concept which seem to be vanishing nowadays. I suspect the need for responsive design is pushing designers towards stacked displays?
+Tabs are a web concept which seem to be vanishing nowadays. I suspect the need for responsive design is pushing designers towards stacked displays?
 
 Anyway, the idea is that a site displays big objects across pages, not in hard-to-digest one-page lumps. URLs like, ::
 
@@ -515,29 +541,6 @@ Note that no action CSS files are declared because there is only only level of l
 An aside: if you remove 'dmenu-horizontal' then the tabs become a downward stack. In other words, a natural start for responsive design (though I've never found a tabs-into-responsive-stack design on the web).
 
 
-
-'click'-action Javascripted menus
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-There is also a Javascript solution (which uses the JQuery from Django admin). Javascript action offers a fundamentally different experience, as the menu will not work on hover, but on clicking. This may or may not be a preference. Click actions also influence design (hover themes will not work well for click themes, and visa-versa). Before you ask, yes, I know CSS can do click menus, and that JS can do hover menus. I decided against both paths. If you, the reader, want to prove something, go ahead.
-
-We need to put the Javascript into the template (or our menu will be unwantedly static). Here is everything you need, plus a theme, for the template head (or Media). So; JQuery, Django JQuery init, the menu JS code, the CSS base and theme, ::
-
-
-    <script type="text/javascript" src={% static 'admin/js/vendor/jquery/jquery.min.js' %}></script>
-    <script type="text/javascript" src={% static 'admin/js/jquery.init.js' %}></script>
-    <script src={% static 'django_menus/js/django_menu.js' %}></script>
-    <link href={% static 'django_menus/django_menu_base.css' %} type="text/css" media="all" rel="stylesheet">
-    <link href={% static 'django_menus/django_menu_professional_sale.css' %} type="text/css" media="all" rel="stylesheet">            
-  
-Phew. Now, easy, as this is a vertical pushdown menu (the default), ::
-
-        <ul class="dmenu dmenu-js dm-prsale">
-
-PS: a pushdown stacking menu seems to be commonly agreed as one of the best solutions for a responsive design.
-
-I built this theme, and I'm sure it could make some people happy. It's not my idea of good, though. So you get no picture.
-
-  
 
 .. _NiceMenus: https://www.drupal.org/project/nice_menus
 
