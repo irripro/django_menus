@@ -1,0 +1,46 @@
+
+/*
+ * This tab theme inherits font styling from the surrounding structure. 
+ * Please adjust to suit.
+ */ 
+.dm-dttabs {
+    position: relative;
+    text-align: center;
+}
+
+.dm-dttabs a {
+    display:block;
+    text-decoration: none;
+    padding: 0.2em 0.25em 0.3em 0.25em;
+}
+
+.dm-dttabs li {
+    position: relative;
+    z-index: 0;
+    background-color: #ddd;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    border: 1px solid #bbb;
+    box-shadow: inset 0 0 4px #fff;
+    margin: 0 1px;
+}
+
+.dm-dttabs:after {
+    position: absolute;
+    content: "";
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    border-bottom: 1px solid #bbb;
+    z-index: 1;
+}
+
+.dm-dttabs .selected {
+    z-index: 2;
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #f7f7f7; 
+}
+
+.dm-dttabs .selected a {
+    padding-top: 0.4em;
+}

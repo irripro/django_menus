@@ -465,79 +465,55 @@ So,
 Maybe pushing it there, huh, son?
 
 
-
-
-
-Modifying
----------
-These kinds of apps, this kind of code, has a habit of stating, "You can do anything with our code!" This app is for Django, an MVC framework, so this is true. But there is a limit beyond which you are hacking the app, not configuring. Perhaps the following will help.
-
-
-Menu HTML structure
-~~~~~~~~~~~~~~~~~~~~~~~
-Menus may render as default (as_list()) as, ::
-
-    <ul class="dmenu dmenu-right">
-        <li><a href="/articles">Articles</a></li>
-        <li class="submenu selected"><a href="#">About</a>
-            <ul><li class="expanded"><a href="/contact">Contact</a></li>
-            <li class="submenu"><a href="#">Credits</a><ul>
-            <li class="selected"><a href="/credits/now">Now</a></li>
-            <li><a href="/credits/always">Always</a></li>
-            </ul>
-        </li>
-        <li><a href="/login">Login</a></li>
-    </ul>
-
-Some additions to 'class' are hard-coded. These are,
-
-selected
-    item marked as part of the current URL
-
-submenu
-    item marked as a container for a submenu
-    
-icon
-    item marked as the icon image tag
-
-expanded
-    open this branch whatever the GUI state
-    
-disabled
-    item marked as visible but not active
-
-
-
-Menu item HTML/CSS structure
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Mainly applies to the URL(), though some comments also to SubMenu(), ::
-
-    <li class=""><a href="/login"><img class="icon"/>Login</a></li>
-
-The "icon" class is hard-coded.
-
-The structure is unusual, and has implications for CSS. First, you will see that the method of placing icons is an image tag. For many years the usual technique was some padding and a background image, or maybe an inserted DIV. The disadvantage of IMG is that you can not use CSS to place content ::before or ::after. So the wonderful Unicode symbols can not be used. The advantage is that the tag is semantic, and can be reliably sized. A fixed width will space the link text into a column; the only work needed is to set a margin (not padding) on all "menu-item-icon" IMGs.
-
-Second, there is no injected HTML/text to help with placing items to the right. This is because CSS still has no good way of handling this layout ('flexbox' has been massively promoted. Hummm). But the ancient background-image technique is good (especially as django-menu uses a written block to handle left icons), e.g. ::
-
-    background-image: url('/static/django_menus/icons/black_small_right_triangle.svg');
-    background-position: right center;
-    background-repeat: no-repeat;  
-    
-    
-Things you can do, and not do
+Click-action Javascript menus
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-CSS override
-    If you want to change colors/font-size, padding etc. No maintenance.
 
-Change direction of menu
-    If you use built-in CSS, easy. Add the appropriate classes. No maintenance.
 
-Insert new items to menus
-    Producing a new item is easy, look in .items.py. Rendering it currently involves overriding the attribute 'handlers' in a Menu(). This is also easy. No maintainence.
-    
-Modify structure of HTML
-    Currently, the app does not implement a templating system for the HTML. It uses string templates located in Itemviews. Override the template attribute in an ItemView. Even better, make a new ItemView with the new template. No maintainence.
+Tabs
+~~~~
+Tabs are web concept which seem to be vanishing nowadays. I suspect the need for responsive design is pushing designers towards stacked displays?
+
+Anyway, the idea is that a site displays big objects across pages, not in hard-to-digest one-page lumps. URLs like,
+
+/product/1/detail
+/product/1/spec
+/product/1/comments
+
+/product/2/detail
+/product/2/spec
+/product/2/comments
+ 
+Then the site uses relative URLs to access (another way is a Javascript hide, but this has accessibility issues).
+
+To make a menu, you need, ::
+
+    'PRODUCT_TABS': [
+        URL("product", "product"),
+        URL("spec", "spec"),
+        URL("comments", "comments"),
+    ],
+
+That simple. And the menu will navigate from one URL to another.
+
+However, there are some style issues. First, if you want 'select' on such a menu, it will need to match against the tail of the URL (to match the relative URLs used in the config above). Then the menu needs some unusual CSS styling. Django_menus has a theme to try, ::
+
+    <link href={% static 'django_menus/django_menu_base.css' %} type="text/css" media="all" rel="stylesheet">
+    <link href={% static 'django_menus/django_menu_desktop_tabs.css' %} type="text/css" media="all" rel="stylesheet">
+
+        <ul class="dmenu dmenu-horizontal dm-dttabs">
+
+
+        {% get_menu "site/PRODUCT_TABS?trail_key=TAIL1;select_leaf=True" as product_tabs %}
+        
+Note that there are no action CSS files declared because there is only only level of links (if you want multi-level tabs, go do it). Looks like this,
+
+.. figure:: https://raw.githubusercontent.com/rcrowther/django_menus/master/docs/images/desktop_tabs.png
+    :width: 160 px
+    :alt: tabs screenshot
+    :align: center
+
+Interesting aside: if you remove 'dmenu-horizontal' then the tabs become a downward stack. In other words, a natural start for a responsive design (though I've never found a tabs-into-responsive-stack design on the web).
+
 
 
 'click'-action Javascripted menus
@@ -562,13 +538,6 @@ PS: a pushdown stacking menu seems to be commonly agreed as one of the best solu
 I built this theme, and I'm sure it could make some people happy. It's not my idea of good, though. So you get no picture.
 
   
-  
-Fun things you can do
-~~~~~~~~~~~~~~~~~~~~~
-- Translucent menu
-- Get some CSS animation going
-(why, why do I even suggest this?)
-
 
 .. _NiceMenus: https://www.drupal.org/project/nice_menus
 
