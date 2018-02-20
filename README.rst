@@ -473,19 +473,19 @@ Tabs
 ~~~~
 Tabs are web concept which seem to be vanishing nowadays. I suspect the need for responsive design is pushing designers towards stacked displays?
 
-Anyway, the idea is that a site displays big objects across pages, not in hard-to-digest one-page lumps. URLs like,
+Anyway, the idea is that a site displays big objects across pages, not in hard-to-digest one-page lumps. URLs like, ::
 
-/product/1/detail
-/product/1/spec
-/product/1/comments
-
-/product/2/detail
-/product/2/spec
-/product/2/comments
+    /product/1/detail
+    /product/1/spec
+    /product/1/comments
+    
+    /product/2/detail
+    /product/2/spec
+    /product/2/comments
  
 Then the site uses relative URLs to access (another way is a Javascript hide, but this has accessibility issues).
 
-To make a menu, you need, ::
+To configure a tab menu is the same as usual, but with relative URLs e.g. ::
 
     'PRODUCT_TABS': [
         URL("product", "product"),
@@ -505,14 +505,14 @@ However, there are some style issues. First, if you want 'select' on such a menu
 
         {% get_menu "site/PRODUCT_TABS?trail_key=TAIL1;select_leaf=True" as product_tabs %}
         
-Note that there are no action CSS files declared because there is only only level of links (if you want multi-level tabs, go do it). Looks like this,
+Note that no action CSS files are declared because there is only only level of links (if you want multi-level tabs, go do it). Looks like this,
 
 .. figure:: https://raw.githubusercontent.com/rcrowther/django_menus/master/docs/images/desktop_tabs.png
     :width: 160 px
     :alt: tabs screenshot
     :align: center
 
-Interesting aside: if you remove 'dmenu-horizontal' then the tabs become a downward stack. In other words, a natural start for a responsive design (though I've never found a tabs-into-responsive-stack design on the web).
+An aside: if you remove 'dmenu-horizontal' then the tabs become a downward stack. In other words, a natural start for responsive design (though I've never found a tabs-into-responsive-stack design on the web).
 
 
 
