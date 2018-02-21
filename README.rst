@@ -213,6 +213,37 @@ Menu Construction using MenuItems
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Menubase has a structure like above. You can find the MenuItem definitions in the file items.py.
 
+
+Validation
+++++++++++
+MenuItems can be individually validated. Also, items of a type can be generally validated in an ItemHandler.
+
+Like django.core validators, Django_menus validators work by throwing a ValidationError. But they do not have the same signature as django.core validators, ::
+
+    def validation_func(request, item_data):
+        """
+        Returns True if request.user authenticated else returns False
+        """
+        if (validation fails):
+            raise ValidationError(_('Not Valid.'), code='invalid')
+        
+Several validators have been built in to django_menus and can be found in django_menus.validators. These are mainly for authentification. Of course, blocking a menu item from showing is not a block on access. But it is user-friendly to show a user only what they can access.
+
+The validators recieve menu item data. The menu item is in a raw state, a dict from the the configuration data (though there is a prepare() hook to do data conversion or normalization, if necessary). This data allows the validation to, for example, target specific types of URLS. Please bear in mind that menu item data may be untrusted (from the DB via. menuitems.QuerySet).
+
+Validators are set (in MenuItems or in ItemHandlers) as a list of functions e.g. for a validator in a MenuItem, ::
+
+    from django_menus import SubMenu, URL, Separator, QuerySet
+    from django_menus import validators
+    
+        'NAV_SITE_MENU': [
+            ...,
+            URL("Admin", "/site/page/admin/", validators=[validators.is_authenticated]),
+        ]
+        
+Validators are mainly run in the ItemHandlers, but you do not need to know much about the system.
+
+    
 Half-dynamic construction
 +++++++++++++++++++++++++
 One of the MenuItems is not a subclass of MenuItem, but is a Menutem generator. It is called QuerySet.

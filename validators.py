@@ -1,35 +1,53 @@
-def is_superuser(request):
-    """
-    Returns True if request.user is superuser else returns False
-    """
-    return is_authenticated(request) and request.user.is_superuser
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 
-def is_staff(request):
+
+def is_authenticated(request, item_data):
     """
-    Returns True if request.user is staff else returns False
+    True if request.user authenticated else False
     """
-    return is_authenticated(request) and request.user.is_staff
+    if (not request.user.is_authenticated):
+        raise ValidationError(_('Not authenticated.'), code='invalid')
+
+def is_superuser(request, item_data):
+    """
+    True if request.user is superuser else False
+    """
+    if (not is_authenticated(request, item_data) and request.user.is_superuser):
+        raise ValidationError(_('Not superuser.'), code='invalid')
 
 
-def is_authenticated(request):
+def is_staff(request, item_data):
     """
-    Returns True if request.user authenticated else returns False
+    True if request.user is staff else False
     """
-    return request.user.is_authenticated
+    if (not is_authenticated(request, item_data) and request.user.is_staff):
+        raise ValidationError(_('Not staff.'), code='invalid')
 
+def is_anonymous(request, item_data):
+    """
+    True if request.user is not authenticated else False
+    """
+    if (request.user.is_authenticated):
+        raise ValidationError(_('User is not anonymous.'), code='invalid')
 
-def is_anonymous(request):
+class PermissionValidator:
+    def __init__(self, perm):
+        self.perm = perm
+        
+    def __call__(self, request, item_data):
+        if (not request.user.has_perm(self.perm)):
+            raise ValidationError(
+                _('User has no permission.'), 
+                code='invalid',
+                params={
+                    'perm': self.perm,
+                }
+            )   
+             
+def has_permission(perm):
     """
-    Returns True if request.user is not authenticated else returns False
+    True if request.user is has permission else False
     """
-    return not request.user.is_authenticated
-
-
-def user_has_permission(request, permission):
-    """
-    Returns True if request.user has the permission else returns False
-    :param request: HttpRequest
-    :param permission: Permission to be searched
-    """
-    return request.user.has_perm(permission)
+    return PermissionValidator(perm)

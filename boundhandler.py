@@ -7,6 +7,7 @@ from django.utils.html import conditional_escape, format_html, html_safe
 from django.utils.inspect import func_accepts_kwargs, func_supports_parameter
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
 
 __all__ = ('BoundHandler',)
 
@@ -18,7 +19,10 @@ class BoundHandler:
     '''
     Bind a handler with a view instance and accept data.
     One is constructed for every menu item. Cached across web calls.
+    
     '''
+    #! need to get rid of menu, it is mutable, and bound handler is cached.
+    #! or pass menu opts.
     def __init__(self, menu, handler, item_data):
         self.menu = menu
         self.handler = handler
@@ -88,7 +92,7 @@ class BoundHandler:
         True if this BoundHandler's view should be wrapped.
         """
         return self.handler.view.wrap
-
+    
     def validate(self, request, containing_menu_is_valid):
         '''
         Prepares the item data, validates, and informs the view of the 
@@ -97,7 +101,9 @@ class BoundHandler:
         '''
         validated = containing_menu_is_valid
         try:
-            self.handler.clean(self.item_data)
+            for validator in self.item_data.validators:
+                validator(request, self.item_data)
+            self.handler.validate(request, self.item_data)
         except ValidationError as e:
             validated = False
         return validated

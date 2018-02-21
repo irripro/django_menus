@@ -16,8 +16,7 @@ https://pypi.python.org/pypi/django-sitemenu/0.0.4
 https://github.com/Brick85/sitemenu
 --immediate
 #! make URL detection more robust, check Django documentation on position, SimpleMenu variation
-#! check cacheing is working how it should, and is good code
-#! enable validation now split from cache, then test disabling works
+#! check caching is working how it should, and is good code
 -- later
 #? where would 'attrs' parameter injection be most useful?
 #! make multiple handlers and metaclass
@@ -29,7 +28,6 @@ https://github.com/Brick85/sitemenu
 #? trails and URL normalization (and handler/views?) can be permanently cached?
 #! why no submenu indicators on down menu?
 #? real breadcrumbs
-#? pushdown menus good for single line, but z-index down better for horizontal bars
 #? include menu config, such as theme, in config files...
 # : Against is Djangos config convention-'user decision'.
 # : For: nice for a user, and its config material.

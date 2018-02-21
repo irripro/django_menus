@@ -53,26 +53,26 @@ class ItemHandler:
     def prepare_item(self, item):
         '''
         Prepare input data for validation.
-        If the data is normalised or some other mutaation, then it must 
+        If the data is normalised or some other mutation, then it must 
         be copied.
         '''
         return item
         
-    def run_validators(self, item):
+    def run_validators(self, request, item):
         validated = True
         for v in self.validators:
             #try:
-                v(item)
+                v(request, item)
             #except ValidationError as e:
             #    validated = False
 
-    def clean(self, item):
+    def validate(self, request, item):
         '''
         @return clean data
         @throw validation error
         '''
         item = self.prepare_item(item)
-        self.run_validators(item)
+        self.run_validators(request, item)
 
     def get_view_attrs(self, view):
         """

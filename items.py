@@ -5,7 +5,8 @@ import os
 
 #NB: decided against named tuples because of defaults. R.C.
 class MenuItem:
-    pass
+    validators = []
+    #pass
 
 
 class Separator(MenuItem):
@@ -100,7 +101,7 @@ class QuerySet():
     #localize=False, 
     expanded=False 
     disabled=False
-    validators=None
+    validators=[]
     attrs={}
         
     def __init__(self, queryset, 
@@ -112,7 +113,7 @@ class QuerySet():
         #localize=False, 
         expanded=False, 
         disabled=False,
-        validators=None,
+        validators=[],
         attrs={}
     ):
         if (queryset):
