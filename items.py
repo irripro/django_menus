@@ -14,20 +14,20 @@ class Separator(MenuItem):
  
      
 class URLMenuItem(MenuItem):
-    def __init__(self, name, url, 
+    def __init__(self, title, url, 
         validators=[],
         expanded=False, 
         ):
-        self.name = name
+        self.title = title
         self.url = url
         self.validators = validators
         self.expanded = expanded
         super().__init__()
 
     def __repr__(self):
-        return '<{} name={}, url={}>'.format(
+        return '<{} title={}, url={}>'.format(
             self.__class__.__name__,
-            self.name,
+            self.title,
             self.url,
         ) 
 
@@ -35,7 +35,7 @@ class URLMenuItem(MenuItem):
 class SubMenu(URLMenuItem):
     submenu = None
     
-    def __init__(self, name, url, menu_ref,
+    def __init__(self, title, url, menu_ref,
         icon_ref=None,
         validators=[], 
         expanded=False, 
@@ -43,16 +43,16 @@ class SubMenu(URLMenuItem):
         self.menu_ref = menu_ref
         self.icon_ref = icon_ref
         super().__init__(
-            name,
+            title,
             url,
             validators, 
             expanded
         )
 
     def __repr__(self):
-        return '<{} name={}, url={} submenu={}>'.format(
+        return '<{} title={}, url={} submenu={}>'.format(
             self.__class__.__name__,
-            self.name,
+            self.title,
             self.url,
             self.submenu,
         )   
@@ -61,7 +61,7 @@ class SubMenu(URLMenuItem):
 #? can reverses simply be reverse('news-year-archive', args=(year,))?
 class URL(URLMenuItem):
     
-    def __init__(self, name, url,
+    def __init__(self, title, url,
         icon_ref=None, 
         validators=[],
         expanded=False, 
@@ -69,7 +69,7 @@ class URL(URLMenuItem):
         ):
         self.icon_ref = icon_ref
         super().__init__(
-            name,
+            title,
             url,
             validators, 
             expanded
@@ -151,17 +151,9 @@ class QuerySet():
               self.model._meta.model_name,
               os.sep,
               )
-        
-        #if ((self.url_field) and (not self.url_template)):
-          #raise ImproperlyConfigured('If a url field is declared it must be given a template: model name:"{}" : url field:"{}"'.format(
-          #self.model._meta.object_name,
-          #self.url_field
-          #))
                   
         if (use_absolute_url):
             self.use_absolute_url = use_absolute_url
-        #if (not(url_field or self.use_absolute_url)):
-            #raise ImproperlyConfigured("'url_field' or 'use_absolute_url' attribute required")
         if (icon_ref):
             self.icon_ref=icon_ref 
         #if (localize):
@@ -177,7 +169,7 @@ class QuerySet():
     def as_menu(self):
         menu = []
         for o in self.queryset:
-            name = getattr(o, self.title_field)
+            title = getattr(o, self.title_field)
             url = None
             if (self.use_absolute_url):
               url = o.get_absolute_url()
@@ -186,7 +178,7 @@ class QuerySet():
             icon_ref = self.icon_ref
             if (callable(self.icon_ref)):
               icon_ref = icon_ref()
-            item = URL(name, url,
+            item = URL(title, url,
                 icon_ref=self.icon_ref, 
                 validators=self.validators,
                 #localize=self.localize, 

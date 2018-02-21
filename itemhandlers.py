@@ -1,4 +1,3 @@
-import re
 import itertools
 
 from django.core.exceptions import ImproperlyConfigured
@@ -176,31 +175,6 @@ class SubmenuHandler(URLHandler):
             classes.add('expanded')
         return classes
 
-####
-    ##! Get selectors going
-    ##! what is path absolute?
-    ##! match whole or part?
-    ##? What this does is, finally, add a CSS class
-    #def match_url(self, path):
-        #"""
-        #match url determines if this is selected
-        #"""
-        ##if request.user.is_authenticated:
-        #print('slct path:')
-        #print(str(path))
-        #matched = False
-        #if (not self.clean_url):
-             #raise ImproperlyConfigured('match_url requested before validation')
-        ##if self.exact_url:
-        ##    if re.match("%s$" % (self.url,), request.path):
-        ##        matched = True
-        ##elif re.match("%s" % self.url, request.path):
-        
-        ##! not good enough. 
-        ## What about slashes? hash ends?
-        #if re.match("%s" % self.clean_url, path):
-            #matched = True
-        #return matched
         
         
 

@@ -40,15 +40,6 @@ def HEAD2(request_path):
     
 #! media
 #! handle empty menus?
-#! 'active' not enabled
-#! icon_ref
-#! disabled
-#! expanded/disabled on whole menus as option
-#! Separator is a LI item? But that is excessive and makes styling hard.
-# what does Spec say?
-#! item attrs
-#! attrs shoud be default, if not item overriden?
-#! since template filters only take one parameter, namespacing, or auto-app detection?
 #! Needs attrs?
 #class Menu(MediaDefiningClass):
 class Menu():
@@ -98,8 +89,8 @@ class Menu():
         self.request = request
         #print('..........request:')
         #print(str(request))
-        print(str(menu_name))
-        print('..........menu_name:' + menu_name)
+        #print(str(menu_name))
+        #print('..........menu_name:' + menu_name)
         if (not app_name):
             app_name = resolve(request.path).app_name
             if (not app_name):
@@ -155,7 +146,6 @@ class Menu():
         handler = self.handlers.get(menu_item_data.__class__)
         #if (not handler):
         return BoundHandler(
-            self,
             handler(),
             menu_item_data
             )
@@ -198,7 +188,7 @@ class Menu():
                 
                 # extend the data (this sets some dynamic 
                 # configuration)
-                ctx = bh.get_initial_context(valid, trail)
+                ctx = bh.get_initial_context(self, valid, trail)
 
                 #? unwanted mess
                 html_class_attr = ''
@@ -356,10 +346,10 @@ class Menu():
                 )
                 url_chain.pop()
 
-    # query items will be hald-resolved, so here (probably) or in the
-    # boot tests? 
-    # Wherever that is, chains are built there.
     def cache_bound_menu(self, app, menu_name):
+        '''
+        Build the bound-handler and trail caches.
+        '''
         if (not (app in self.bound_menu_cache)):
             self.bound_menu_cache[app] = {}            
             self.url_chain_cache[app] = {}            

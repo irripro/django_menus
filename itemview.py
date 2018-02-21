@@ -1,10 +1,9 @@
-import re
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.widgets import Media
 from django.template.loader import render_to_string
 
 from django.utils.safestring import mark_safe
-from django.templatetags.static import static
+#from django.templatetags.static import static
 from django.utils.html import conditional_escape, html_safe, format_html
 
 
@@ -19,9 +18,6 @@ def rend_attrs(attrs):
 
 
 
-#! need a distinction beteween data given as options
-#! and later calculated (e.g. auto expanding)
-#? use auto-attributed kwargs
 class ItemView:
     '''
     Encapsulate the rendering of a menu item.
@@ -32,17 +28,15 @@ class ItemView:
     elements should be named, nt positioned.
     @param wrap should this menu item be wrapped. Nearly always true, 
     but not always (e.g. separaters)
+    @param attrs attribute dict to add to the view. The data comes 
+    from this class; and from the handler, via boundhandler as_view() 
     '''
     str_tmpl = None
     '''
-    Should this item be wrapped (in LI or DIV) by Menu
+    Should this item be wrapped (in LI or DIV) by Menu?
     '''
     wrap = True
-    # internal
-    #is_disabled = False
         
-    # @param attrs attribute dict to add to the view. The data comes 
-    # from this class; and from the handler, via boundhandler as_view() 
     def __init__(self, attrs=None):
         #? no need to copy now boundhander does the job
         if attrs is not None:
@@ -65,15 +59,11 @@ class ItemView:
     def get_context(self, request, attrs, **kwargs):
         '''
         @param kwargs this the data from a menu item, as transformed by 
-        a handler. It is all passed, as is, to the template context.
+        a handler. It is passed, as is, to the template context.
         '''
         context = {'view' : kwargs}
         context['view'].update({
-            #'name': name,
-            #'value': self.format_value(value),
-            #'disabled' : self.is_disabled,
             'request': request,
-            #'attrs': self.build_attrs(attrs),
             'attrs': attrs,
         })
         return context
@@ -98,21 +88,9 @@ class ItemView:
         Render the view as an HTML string.
         """
         ctx = self.get_context(request, attrs, **kwargs)
-        #self.extend_css_classes(ctx)
         self.format_values(ctx)
-        #print('ctx:' + str(ctx))
         return mark_safe(self.template_render(ctx))
 
-    #- skip this, do it in boundfield
-    #def build_attrs(self, extra_attrs=None):
-        #"""Build an attribute dictionary."""
-        #attrs = self.attrs.copy()
-        #if extra_attrs is not None:
-            #attrs.update(extra_attrs)
-        #return attrs
-        
-    #something about datadisct....
-        
 
         
 class URLView(ItemView):
@@ -120,7 +98,7 @@ class URLView(ItemView):
     # In the rest of the item processing chain, it is a separate item.
     # It is only concaternated right at the end, in the string 
     # template format.
-    str_tmpl = '<a {attrs}>{icon}{name}</a>'
+    str_tmpl = '<a {attrs}>{icon}{title}</a>'
     is_expanded = False
 
     def __init__(self,
@@ -138,7 +116,6 @@ class URLView(ItemView):
 
     def get_context(self, request, attrs, **kwargs):
         context = super().get_context(request, attrs, **kwargs)
-        # do we want to expand here?
         
         ctx = context['view']
         # if disabled, remove href
@@ -154,7 +131,7 @@ class URLView(ItemView):
         return format_html(self.str_tmpl,
             attrs = rend_attrs(ctx_view['attrs']),
             icon = self._rend_icon(ctx_view['icon_ref']),
-            name = ctx_view['name']
+            title = ctx_view['title']
             )
 
 
@@ -228,7 +205,3 @@ class QuerySetView():
     def media(self):
         """Return all media required to render the widgets on this form."""
         return self.media
-
-
-# May also have
-# JavascriptAction?

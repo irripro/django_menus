@@ -23,8 +23,7 @@ class BoundHandler:
     '''
     #! need to get rid of menu, it is mutable, and bound handler is cached.
     #! or pass menu opts.
-    def __init__(self, menu, handler, item_data):
-        self.menu = menu
+    def __init__(self, handler, item_data):
         self.handler = handler
         self.item_data = item_data
         # used to contruct a tree of BoundHandlers, representing
@@ -39,7 +38,6 @@ class BoundHandler:
         return '<{} item={} wrap={}>'.format(
             self.__class__.__name__,
             self.item_data,
-            #self.is_valid,
             self.wrap
         )
         
@@ -47,7 +45,7 @@ class BoundHandler:
         # BoundHandler evaluates to True.
         return True
 
-    def get_initial_context(self, valid, trail):
+    def get_initial_context(self, menu, valid, trail):
        '''
        Get the configuration data as a context.
        The config data is extended with handler-configured data. This 
@@ -56,7 +54,7 @@ class BoundHandler:
        @return a dict version of the data. 
        '''
        ctx = self.item_data.__dict__.copy()
-       self.handler.extend_data(ctx, self.menu, self, valid, trail)
+       self.handler.extend_data(ctx, menu, self, valid, trail)
        return ctx
        
     def as_view(self, initial_context, view=None, attrs={}):
@@ -117,44 +115,3 @@ class BoundHandler:
     def get_view_css_classes(self):
         classes = super().get_view_css_classes()
         return classes
-
-       
-#@html_safe
-#class BoundWidget:
-    #"""
-    #A container class used for iterating over views. This is useful for
-    #views that have choices. For example, the following can be used in a
-    #template:
-
-    #{% for radio in myform.beatles %}
-      #<label for="{{ radio.id_for_label }}">
-        #{{ radio.choice_label }}
-        #<span class="radio">{{ radio.tag }}</span>
-      #</label>
-    #{% endfor %}
-    #"""
-    #def __init__(self, parent_view, data, renderer):
-        #self.parent_view = parent_view
-        #self.data = data
-        #self.renderer = renderer
-
-    #def __str__(self):
-        #return self.tag(wrap_label=True)
-
-    #def tag(self, wrap_label=False):
-        #context = {'view': self.data, 'wrap_label': wrap_label}
-        #return self.parent_view._render(self.template_name, context, self.renderer)
-
-    #@property
-    #def template_name(self):
-        #if 'template_name' in self.data:
-            #return self.data['template_name']
-        #return self.parent_view.template_name
-
-    #@property
-    #def id_for_label(self):
-        #return 'id_%s_%s' % (self.data['name'], self.data['index'])
-
-    #@property
-    #def choice_label(self):
-        #return self.data['label']
